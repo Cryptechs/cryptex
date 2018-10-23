@@ -4,7 +4,7 @@ const axios = require('axios')
 
 var app = express();
 
-app.use(express.static(__dirname + '/../client/dist/'));
+app.use(express.static(__dirname + '/../client/dist'));
 app.use(bodyParser.json())
 
 

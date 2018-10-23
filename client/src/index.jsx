@@ -1,6 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
+import Wallet from "./components/walletValue.jsx";
+import Main from "./components/main.jsx";
+import Add from "./components/add.jsx";
 
 class App extends React.Component {
   constructor(props) {
@@ -11,7 +14,18 @@ class App extends React.Component {
   }
 
   render() {
-    return <h3>Welcome to Cryptex from react!</h3>;
+    return (
+      <div>
+        <h3>Welcome to Cryptex from react!</h3>
+        <Main />
+        <div> -------------------------------- </div>
+        <Wallet />
+        <div> ----------------------------- </div>
+        <Add />
+        <div> ---------------------------- </div>
+        <footer>Bottom of page (names)</footer>
+      </div>
+    );
   }
 }
 
