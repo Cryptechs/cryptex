@@ -11,7 +11,6 @@ class App extends React.Component {
   }
   componentDidMount() {
     console.log("We here");
-    console.log("Micah componenent: ONLINE");
   }
   createUser() {
     //post(users/create)
