@@ -11,7 +11,25 @@ class App extends React.Component {
   }
   componentDidMount() {
     console.log("We here");
-    console.log('Micah componenent: ONLINE');
+    console.log("Micah componenent: ONLINE");
+  }
+  createUser() {
+    //post(users/create)
+  }
+  verifyUser() {
+    //get(/users)
+  }
+  addCoins() {
+    //patch(/wallet/get)
+  }
+  retrieveWallet(user) {
+    //get(/api/coins)
+  }
+  getCoinHistory(coin) {
+    //get (/api)
+  }
+  logout() {
+    //patch or post(/users/logout)
   }
 
   render() {
