@@ -18,7 +18,7 @@ const Graph = props => {
   return (
     <div class="graph">
       <AreaChart
-        width={600}
+        width={800}
         height={400}
         data={props.data}
         margin={{
@@ -34,24 +34,38 @@ const Graph = props => {
         <Tooltip />
         <Area
           type="monotone"
-          dataKey="uv"
+          dataKey="coin1"
           stackId="1"
           stroke="#8884d8"
           fill="#8884d8"
         />
         <Area
           type="monotone"
-          dataKey="pv"
+          dataKey="coin2"
           stackId="1"
           stroke="#82ca9d"
           fill="#82ca9d"
         />
         <Area
           type="monotone"
-          dataKey="amt"
+          dataKey="coin3"
           stackId="1"
           stroke="#ffc658"
           fill="#ffc658"
+        />
+        <Area
+          type="monotone"
+          dataKey="coin4"
+          stackId="1"
+          stroke="#00c6FF"
+          fill="#00c6FF"
+        />
+        <Area
+          type="monotone"
+          dataKey="coin5"
+          stackId="1"
+          stroke="#66c600"
+          fill="#66c600"
         />
       </AreaChart>
     </div>

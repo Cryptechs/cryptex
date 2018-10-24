@@ -10,12 +10,16 @@ class Main extends React.Component {
     const data = [];
 
     for (let i = 50; i > 0; i--) {
-      data.push({
+      let item = {
         name: "Day -" + i,
-        uv: Math.random() * 2000,
-        pv: Math.random() * 2000,
-        amt: Math.random() * 2000
-      });
+        coin1: Math.random() * 2000,
+        coin2: Math.random() * 2000,
+        coin3: Math.random() * 2000,
+        coin4: Math.random() * 2000,
+        coin5: Math.random() * 2000
+      };
+      item.amt = item.coin1 + item.coin2 + item.coin3 + item.coin4 + item.coin5;
+      data.push(item);
     }
     console.log("data=", data);
 
