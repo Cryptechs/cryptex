@@ -4,9 +4,9 @@
 
 ## Team
 
-- **Product Owner**: teamMember
-- **Scrum Master**: teamMember
-- **Development Team Members**: teamMember, teamMember
+- **Product Owner**: Micah Weiss
+- **Scrum Master**: James Dempsey
+- **Development Team Members**: Micah Weiss, James Dempsey, Chris Athanas
 
 ## Table of Contents
 
@@ -20,15 +20,20 @@
 
 ## Usage
 
-> Some usage instructions
+> Basic Cryptocurrency tracking, along with portfolio value management;
 
 ## Requirements
 
-- Node 0.10.x
-- Redis 2.6.x
-- Postgresql 9.1.x
-- React component http://recharts.org/en-US/examples/SynchronizedLineChart
-- etc
+- axios 0.18.
+- babel 6.23.0
+- body-parser 1.18.3
+- express 4.16.4
+- morgan 1.9.1
+- mysql 2.16.0
+- pg 7.5.0
+- react 16.5.2
+- react-charts 1.0.10
+- react-dom 16.5.2
 
 ## Development
 
