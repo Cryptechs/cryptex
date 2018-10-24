@@ -8,8 +8,8 @@ class Main extends React.Component {
 
   render() {
     return (
-      <div>
-        <div>
+      <div class="main">
+        <div class="graphButtons">
           <button>Wallet</button>
           <button>Coin 1</button>
           <button>Coin 2</button>
