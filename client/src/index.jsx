@@ -19,11 +19,8 @@ class App extends React.Component {
       <div>
         <h3>Welcome to Cryptex from react!</h3>
         <Main />
-        <div> -------------------------------- </div>
         <Wallet />
-        <div> ----------------------------- </div>
         <Add />
-        <div> ---------------------------- </div>
         <footer>Bottom of page (names)</footer>
       </div>
     );
