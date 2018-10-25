@@ -6,6 +6,8 @@ import Main from "./components/main.jsx";
 import Add from "./components/add.jsx";
 import { isAbsolute } from "path";
 
+// comment testing gitignore
+
 class App extends React.Component {
   constructor(props) {
     super(props);
