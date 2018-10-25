@@ -12,7 +12,28 @@ class App extends React.Component {
   }
   componentDidMount() {
     console.log("We here");
+<<<<<<< HEAD
     console.log("Micah componenent: ONLINE");
+=======
+  }
+  createUser() {
+    //post(users/create)
+  }
+  verifyUser() {
+    //get(/users)
+  }
+  addCoins() {
+    //patch(/wallet/get)
+  }
+  retrieveWallet(user) {
+    //get(/api/coins)
+  }
+  getCoinHistory(coin) {
+    //get (/api)
+  }
+  logout() {
+    //patch or post(/users/logout)
+>>>>>>> 134e3224d94bb250c75d71279f9f4ba6c5574189
   }
 
   render() {
