@@ -40,24 +40,47 @@ class App extends React.Component {
     }
 
     let mockCoinNames = ["BTC", "LTC", "ETH", "XRP", "EOS"];
-    axios
-      .get(
-        "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=LTC&interval=60min&outputsize=compact&limit=1&apikey=" +
-          ALPHA_ADVANTAGE_API_KEY
-      )
-      .then(function(response) {
-        console.log(response);
-        for (let i = 50; i >= 0; i--) {
-          coinData[i].coin1 =
-            response.data["Time Series (60min)"][
-              Object.keys(response.data["Time Series (60min)"])[i]
-            ]["4. close"];
-        }
-        this.setState({ coinData: coinData });
-      })
-      .catch(function(error) {
-        console.log(error);
-      });
+    for (let coinIdx = 0; coinIdx < mockCoinNames.length; coinIdx++) {
+      axios
+        .get(
+          "https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol=" +
+            mockCoinNames[coinIdx] +
+            "&market=USD&apikey=" +
+            ALPHA_ADVANTAGE_API_KEY
+        )
+        .then(function(response) {
+          // get the crypto ticker name from the response object
+          //  && then look it up in our index of coinNames
+          let coinIndex = mockCoinNames.indexOf(
+            response.data["Meta Data"]["2. Digital Currency Code"]
+          );
+
+          console.log("coinIndex=", coinIndex);
+
+          if (coinIndex === -1) {
+            console.log(
+              "Bad Coinindex for ",
+              response.data["Meta Data"]["2. Digital Currency Code"]
+            );
+          }
+
+          for (let i = 50; i >= 0; i--) {
+            let data =
+              response.data["Time Series (Digital Currency Daily)"][
+                Object.keys(
+                  response.data["Time Series (Digital Currency Daily)"]
+                )[i]
+              ]["4a. close (USD)"];
+
+            // Use the index of the coin from the response
+            eval(`coinData[${i}].coin${coinIndex + 1} = ${data};`);
+          }
+          this.setState({ coinData: coinData });
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    }
 
     // Mock wallet data (This is the current total only)
     let wallet = {};
