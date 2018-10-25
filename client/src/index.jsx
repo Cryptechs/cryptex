@@ -12,6 +12,24 @@ class App extends React.Component {
   componentDidMount() {
     console.log("We here");
   }
+  createUser() {
+    //post(users/create)
+  }
+  verifyUser() {
+    //get(/users)
+  }
+  addCoins() {
+    //patch(/wallet/get)
+  }
+  retrieveWallet(user) {
+    //get(/api/coins)
+  }
+  getCoinHistory(coin) {
+    //get (/api)
+  }
+  logout() {
+    //patch or post(/users/logout)
+  }
 
   render() {
     return (
