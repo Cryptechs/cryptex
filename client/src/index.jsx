@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
-import Wallet from "./components/walletValue.jsx";
+import Wallet from "./components/wallet.jsx";
 import Main from "./components/main.jsx";
 import Add from "./components/add.jsx";
 import { isAbsolute } from "path";
@@ -41,7 +41,7 @@ class App extends React.Component {
     for (let i = 50; i > 0; i--) {
       let item = {
         name: "Day -" + i,
-        coin1: Math.random() * 2000,
+        coin1: Math.random() * 2001,
         coin2: Math.random() * 2000,
         coin3: Math.random() * 2000,
         coin4: Math.random() * 2000,
@@ -57,11 +57,12 @@ class App extends React.Component {
     // Mock wallet data
     const wallet = {};
     wallet.coins = [];
+    let mockCoinNames = ["BTC", "LTC", "ETH", "XRP", "EOS"];
     for (let i = 0; i < 5; i++) {
       wallet.coins.push({
         amount: Math.random() * 10,
         value: Math.random() * 100,
-        name: giveRandomAlpha(5)
+        name: mockCoinNames[i]
       });
     }
     wallet.walletHistory = { walletHistory };
@@ -73,10 +74,7 @@ class App extends React.Component {
         <Wallet wallet={wallet} />
         <Add />
         <div>
-          <footer>
-            Micah Weiss, James Dempsey, Chris Athanas (Reverse Alphabetic Order
-            by First and Last Name)
-          </footer>
+          <footer>Micah Weiss, James Dempsey, Chris Athanas</footer>
         </div>
       </div>
     );
