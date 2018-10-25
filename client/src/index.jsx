@@ -16,6 +16,7 @@ class App extends React.Component {
   }
 
   render() {
+    // Mock coin data
     const coinData = [];
     const walletHistory = [];
     for (let i = 50; i > 0; i--) {
@@ -34,9 +35,10 @@ class App extends React.Component {
     }
     console.log("coinData=", coinData);
 
+    // Mock wallet data
     const wallet = {};
     wallet.coins = [];
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 5; i++) {
       wallet.coins.push({
         amount: Math.random() * 10,
         value: Math.random() * 100,
