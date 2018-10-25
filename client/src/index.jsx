@@ -11,9 +11,48 @@ import { isAbsolute } from "path";
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      coinData: [],
+      wallet: {}
+    };
   }
+
   componentDidMount() {
-    console.log("We here");
+    console.log("Component Mounted");
+
+    // Mock coin data
+    const coinData = [];
+    const walletHistory = [];
+    for (let i = 50; i > 0; i--) {
+      let item = {
+        name: "Day -" + i,
+        coin1: Math.random() * 2000,
+        coin2: Math.random() * 2000,
+        coin3: Math.random() * 2000,
+        coin4: Math.random() * 2000,
+        coin5: Math.random() * 2000
+      };
+      coinData.push(item);
+      walletHistory.push(
+        item.coin1 + item.coin2 + item.coin3 + item.coin4 + item.coin5
+      );
+    }
+    console.log("coinData=", coinData);
+
+    // Mock wallet data (This is the current total only)
+    let wallet = {};
+    wallet.coins = [];
+    let mockCoinNames = ["BTC", "LTC", "ETH", "XRP", "EOS"];
+    for (let i = 0; i < 5; i++) {
+      wallet.coins.push({
+        amount: Math.random() * 10,
+        value: Math.random() * 100,
+        name: mockCoinNames[i]
+      });
+    }
+    wallet.walletHistory = { walletHistory };
+
+    this.setState({ wallet: wallet, coinData: coinData });
   }
   createUser() {
     //post(users/create)
@@ -35,43 +74,11 @@ class App extends React.Component {
   }
 
   render() {
-    // Mock coin data
-    const coinData = [];
-    const walletHistory = [];
-    for (let i = 50; i > 0; i--) {
-      let item = {
-        name: "Day -" + i,
-        coin1: Math.random() * 2001,
-        coin2: Math.random() * 2000,
-        coin3: Math.random() * 2000,
-        coin4: Math.random() * 2000,
-        coin5: Math.random() * 2000
-      };
-      coinData.push(item);
-      walletHistory.push(
-        item.coin1 + item.coin2 + item.coin3 + item.coin4 + item.coin5
-      );
-    }
-    console.log("coinData=", coinData);
-
-    // Mock wallet data
-    const wallet = {};
-    wallet.coins = [];
-    let mockCoinNames = ["BTC", "LTC", "ETH", "XRP", "EOS"];
-    for (let i = 0; i < 5; i++) {
-      wallet.coins.push({
-        amount: Math.random() * 10,
-        value: Math.random() * 100,
-        name: mockCoinNames[i]
-      });
-    }
-    wallet.walletHistory = { walletHistory };
-
     return (
       <div>
         <h3>Welcome to Cryptex!</h3>
-        <Main coinData={coinData} wallet={wallet} />
-        <Wallet wallet={wallet} />
+        <Main coinData={this.state.coinData} wallet={this.state.wallet} />
+        <Wallet wallet={this.state.wallet} />
         <Add />
         <div>
           <footer>Micah Weiss, James Dempsey, Chris Athanas</footer>
