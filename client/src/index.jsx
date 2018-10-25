@@ -40,18 +40,21 @@ class App extends React.Component {
       wallet.coins.push({
         amount: Math.random() * 10,
         value: Math.random() * 100,
-        name: "Coin " + Math.random() * 1000 //giveRandomAlpha(5)
+        name: "XYZ" + ~~(Math.random() * 1000) //giveRandomAlpha(5)
       });
     }
     wallet.walletHistory = { walletHistory };
 
     return (
       <div>
-        <h3>Welcome to Cryptex from react!</h3>
+        <h3>Welcome to Cryptex!</h3>
         <Main coinData={coinData} wallet={wallet} />
         <Wallet wallet={wallet} />
         <Add />
-        <footer>Bottom of page (names)</footer>
+        <footer>
+          Micah Weiss, James Dempsey, Chris Athanas (Reverse Alphabetic Order by
+          First and Last Name)
+        </footer>
       </div>
     );
   }
