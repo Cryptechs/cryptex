@@ -5,6 +5,7 @@ import Wallet from "./components/wallet.jsx";
 import Main from "./components/main.jsx";
 import Add from "./components/add.jsx";
 import { isAbsolute } from "path";
+import ALPHA_ADVANTAGE_API_KEY from "../config/config.js";
 
 // comment testing gitignore
 
@@ -23,7 +24,7 @@ class App extends React.Component {
     // Mock coin data
     const coinData = [];
     const walletHistory = [];
-    for (let i = 50; i > 0; i--) {
+    for (let i = 50; i >= 0; i--) {
       let item = {
         name: "Day -" + i,
         coin1: Math.random() * 2000,
@@ -37,12 +38,30 @@ class App extends React.Component {
         item.coin1 + item.coin2 + item.coin3 + item.coin4 + item.coin5
       );
     }
-    console.log("coinData=", coinData);
+
+    let mockCoinNames = ["BTC", "LTC", "ETH", "XRP", "EOS"];
+    axios
+      .get(
+        "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=LTC&interval=60min&outputsize=compact&limit=1&apikey=" +
+          ALPHA_ADVANTAGE_API_KEY
+      )
+      .then(function(response) {
+        console.log(response);
+        for (let i = 50; i >= 0; i--) {
+          coinData[i].coin1 =
+            response.data["Time Series (60min)"][
+              Object.keys(response.data["Time Series (60min)"])[i]
+            ]["4. close"];
+        }
+        this.setState({ coinData: coinData });
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
 
     // Mock wallet data (This is the current total only)
     let wallet = {};
     wallet.coins = [];
-    let mockCoinNames = ["BTC", "LTC", "ETH", "XRP", "EOS"];
     for (let i = 0; i < 5; i++) {
       wallet.coins.push({
         amount: Math.random() * 10,
