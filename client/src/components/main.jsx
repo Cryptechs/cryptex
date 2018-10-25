@@ -7,21 +7,9 @@ class Main extends React.Component {
   }
 
   render() {
-    const data = [];
-
-    for (let i = 50; i > 0; i--) {
-      data.push({
-        name: "Day -" + i,
-        uv: Math.random() * 2000,
-        pv: Math.random() * 2000,
-        amt: Math.random() * 2000
-      });
-    }
-    console.log("data=", data);
-
     return (
-      <div class="main">
-        <div class="graphButtons">
+      <div className="main">
+        <div className="graphButtons">
           <button>Wallet</button>
           <button>Coin 1</button>
           <button>Coin 2</button>
@@ -29,7 +17,7 @@ class Main extends React.Component {
           <button>Coin 4</button>
           <button>Coin 5</button>
         </div>
-        <Graph data={data} />
+        <Graph data={this.props.coinData} />
       </div>
     );
   }
