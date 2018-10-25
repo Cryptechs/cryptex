@@ -5,6 +5,7 @@ import Wallet from "./components/walletValue.jsx";
 import Main from "./components/main.jsx";
 import Add from "./components/add.jsx";
 import { isAbsolute } from "path";
+//import { BrowserRouter } from "react-router-dom";
 
 // comment testing gitignore
 
@@ -91,4 +92,5 @@ function giveRandomAlpha(numChars) {
   return res;
 }
 
-ReactDOM.render(<App />, document.getElementById("app"));
+export default App;
+//ReactDOM.render(<App />, document.getElementById("app"));
