@@ -4,6 +4,7 @@ import axios from "axios";
 import Wallet from "./components/walletValue.jsx";
 import Main from "./components/main.jsx";
 import Add from "./components/add.jsx";
+import { isAbsolute } from "path";
 
 class App extends React.Component {
   constructor(props) {
@@ -11,6 +12,9 @@ class App extends React.Component {
   }
   componentDidMount() {
     console.log("We here");
+<<<<<<< HEAD
+    console.log("Micah componenent: ONLINE");
+=======
   }
   createUser() {
     //post(users/create)
@@ -29,19 +33,64 @@ class App extends React.Component {
   }
   logout() {
     //patch or post(/users/logout)
+>>>>>>> 134e3224d94bb250c75d71279f9f4ba6c5574189
   }
 
   render() {
+    // Mock coin data
+    const coinData = [];
+    const walletHistory = [];
+    for (let i = 50; i > 0; i--) {
+      let item = {
+        name: "Day -" + i,
+        coin1: Math.random() * 2000,
+        coin2: Math.random() * 2000,
+        coin3: Math.random() * 2000,
+        coin4: Math.random() * 2000,
+        coin5: Math.random() * 2000
+      };
+      coinData.push(item);
+      walletHistory.push(
+        item.coin1 + item.coin2 + item.coin3 + item.coin4 + item.coin5
+      );
+    }
+    console.log("coinData=", coinData);
+
+    // Mock wallet data
+    const wallet = {};
+    wallet.coins = [];
+    for (let i = 0; i < 5; i++) {
+      wallet.coins.push({
+        amount: Math.random() * 10,
+        value: Math.random() * 100,
+        name: "XYZ" + ~~(Math.random() * 1000) //giveRandomAlpha(5)
+      });
+    }
+    wallet.walletHistory = { walletHistory };
+
     return (
       <div>
-        <h3>Welcome to Cryptex from react!</h3>
-        <Main />
-        <Wallet />
+        <h3>Welcome to Cryptex!</h3>
+        <Main coinData={coinData} wallet={wallet} />
+        <Wallet wallet={wallet} />
         <Add />
-        <footer>Bottom of page (names)</footer>
+        <div>
+          <footer>
+            Micah Weiss, James Dempsey, Chris Athanas (Reverse Alphabetic Order
+            by First and Last Name)
+          </footer>
+        </div>
       </div>
     );
   }
+}
+
+function giveRandomAlpha(numChars) {
+  let res = "";
+  for (let i = 0; i < numChars; i++) {
+    res += String.fromCharCode(String.toCharCode("A") + Math.random() * 26);
+  }
+  return res;
 }
 
 ReactDOM.render(<App />, document.getElementById("app"));
