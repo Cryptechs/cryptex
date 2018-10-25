@@ -12,28 +12,7 @@ class App extends React.Component {
   }
   componentDidMount() {
     console.log("We here");
-<<<<<<< HEAD
     console.log("Micah componenent: ONLINE");
-=======
-  }
-  createUser() {
-    //post(users/create)
-  }
-  verifyUser() {
-    //get(/users)
-  }
-  addCoins() {
-    //patch(/wallet/get)
-  }
-  retrieveWallet(user) {
-    //get(/api/coins)
-  }
-  getCoinHistory(coin) {
-    //get (/api)
-  }
-  logout() {
-    //patch or post(/users/logout)
->>>>>>> 134e3224d94bb250c75d71279f9f4ba6c5574189
   }
 
   render() {
@@ -63,7 +42,7 @@ class App extends React.Component {
       wallet.coins.push({
         amount: Math.random() * 10,
         value: Math.random() * 100,
-        name: "XYZ" + ~~(Math.random() * 1000) //giveRandomAlpha(5)
+        name: giveRandomAlpha(5)
       });
     }
     wallet.walletHistory = { walletHistory };
@@ -88,7 +67,7 @@ class App extends React.Component {
 function giveRandomAlpha(numChars) {
   let res = "";
   for (let i = 0; i < numChars; i++) {
-    res += String.fromCharCode(String.toCharCode("A") + Math.random() * 26);
+    res += String.fromCharCode(65 + Math.random() * 26);
   }
   return res;
 }
