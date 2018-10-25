@@ -16,7 +16,7 @@ import {
 
 const Graph = props => {
   return (
-    <div class="graph">
+    <div className="graph">
       <AreaChart
         width={800}
         height={400}
@@ -66,6 +66,13 @@ const Graph = props => {
           stackId="1"
           stroke="#66c600"
           fill="#66c600"
+        />
+        <Area
+          type="monotone"
+          dataKey="amt"
+          stackId="1"
+          stroke="#66c600"
+          fill="#ffc6ff"
         />
       </AreaChart>
     </div>
