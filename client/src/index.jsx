@@ -53,10 +53,12 @@ class App extends React.Component {
         <Main coinData={coinData} wallet={wallet} />
         <Wallet wallet={wallet} />
         <Add />
-        <footer>
-          Micah Weiss, James Dempsey, Chris Athanas (Reverse Alphabetic Order by
-          First and Last Name)
-        </footer>
+        <div>
+          <footer>
+            Micah Weiss, James Dempsey, Chris Athanas (Reverse Alphabetic Order
+            by First and Last Name)
+          </footer>
+        </div>
       </div>
     );
   }
