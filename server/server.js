@@ -9,8 +9,18 @@ app.use(bodyParser.json())
 
 
 
+app.post('/users/create')
 
-console.log('testing jamesBranch');
+app.get('/users')
+
+app.patch('/wallet/get')
+
+app.get('/api/coins')
+
+app.get('/api')
+
+app.patch('/users/logout')
+
 
 
 
