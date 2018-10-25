@@ -6,6 +6,8 @@ import Main from "./components/main.jsx";
 import Add from "./components/add.jsx";
 import { isAbsolute } from "path";
 
+// comment testing gitignore
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -59,7 +61,7 @@ class App extends React.Component {
       wallet.coins.push({
         amount: Math.random() * 10,
         value: Math.random() * 100,
-        name: "XYZ" + ~~(Math.random() * 1000) //giveRandomAlpha(5)
+        name: giveRandomAlpha(5)
       });
     }
     wallet.walletHistory = { walletHistory };
@@ -84,7 +86,7 @@ class App extends React.Component {
 function giveRandomAlpha(numChars) {
   let res = "";
   for (let i = 0; i < numChars; i++) {
-    res += String.fromCharCode(String.toCharCode("A") + Math.random() * 26);
+    res += String.fromCharCode(65 + Math.random() * 26);
   }
   return res;
 }

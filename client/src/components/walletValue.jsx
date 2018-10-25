@@ -6,9 +6,10 @@ const Wallet = props => {
   return (
     <div className="wallet">
       Total Value = $
-      {wallet.coins.reduce((total, i) => {
-        total += i.amount * i.value;
-      }, 0)}
+      {wallet.coins.reduce(
+        (total, i) => (total = total + i.amount * i.value),
+        0
+      )}
       <br />
       {wallet.coins.map((i, idx) => {
         return (
