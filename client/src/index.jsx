@@ -75,6 +75,9 @@ class App extends React.Component {
             // Use the index of the coin from the response
             eval(`coinData[${i}].coin${coinIndex + 1} = ${data};`);
           }
+          // this.setState({ coinData: coinData });
+        })
+        .finally(function() {
           this.setState({ coinData: coinData });
         })
         .catch(function(error) {
