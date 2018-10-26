@@ -56,6 +56,7 @@ class Auth {
         // clear id token, profile, and expiration
         console.log('in auth0')
         console.log(localStorage)
+        localStorage.profile = 'undefined';
         this.idToken = null;
         this.profile = null;
         this.expiresAt = null;

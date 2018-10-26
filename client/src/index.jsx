@@ -6,6 +6,7 @@ import Add from "./components/add.jsx";
 import { isAbsolute } from "path";
 import ALPHA_ADVANTAGE_API_KEY from "../config/config.js";
 import auth0Client from "./authZero";
+import axios from "axios";
 
 class App extends React.Component {
   constructor(props) {
@@ -18,8 +19,12 @@ class App extends React.Component {
 
   componentDidMount() {
     console.log("Component Mounted");
-    var profile = auth0Client.handleAuthentication();
-    setTimeout(() => console.log(profile), 5000);
+    //console.log(localStorage, localStorage.profile);
+    if (localStorage.profile === "undefined") {
+    }
+    setTimeout(() => {
+      console.log(localStorage, "local storage after");
+    }, 5000);
 
     // Mock coin data
     const coinData = [];

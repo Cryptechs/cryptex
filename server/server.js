@@ -4,6 +4,8 @@ const axios = require('axios')
 var path = require('path')
 var app = express();
 
+
+
 app.use(express.static(__dirname + '/../client/dist'));
 app.use(bodyParser.json())
 
@@ -20,6 +22,8 @@ app.get('/api/coins')
 app.get('/api')
 
 app.patch('/users/logout')
+
+
 
 
 
