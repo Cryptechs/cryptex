@@ -3,5 +3,5 @@ bower_components/
 *.log
 
 build/
-dist/bundle.js
-package-lock.json
+client/dist/bundle.js
+client/config/config.js
