@@ -18,8 +18,20 @@ class App extends React.Component {
     };
   }
 
-  componentDidMount() {
-    console.log("Component Mounted");
+
+  loadAsync() {
+    const firstRequest = await axios.get('https://maps.googleapis.com/maps/api/geocode/json?&address=' + this.props.p1);
+    const secondRequest = await axios.get('https://maps.googleapis.com/maps/api/geocode/json?&address=' + this.props.p2);
+    const thirdRequest = await axios.get('https://maps.googleapis.com/maps/api/directions/json?origin=place_id:' + firstRequest.data.results.place_id + '&destination=place_id:' + secondRequest.data.results.place_id + '&key=' + 'API-KEY-HIDDEN');
+  
+    this.setState({
+      p1Location: firstRequest.data,
+      p2Location: SecondRequest.data,
+      route: thirdRequest.data,
+    });
+  }
+
+  async componentDidMount() {
 
     // Mock coin data
     const coinData = [];
@@ -40,6 +52,7 @@ class App extends React.Component {
     }
 
     let mockCoinNames = ["BTC", "LTC", "ETH", "XRP", "EOS"];
+    let coinFullNames = mockCoinNames.slice();
     for (let coinIdx = 0; coinIdx < mockCoinNames.length; coinIdx++) {
       axios
         .get(
@@ -54,8 +67,6 @@ class App extends React.Component {
           let coinIndex = mockCoinNames.indexOf(
             response.data["Meta Data"]["2. Digital Currency Code"]
           );
-
-          console.log("coinIndex=", coinIndex);
 
           if (coinIndex === -1) {
             console.log(
@@ -75,7 +86,8 @@ class App extends React.Component {
             // Use the index of the coin from the response
             eval(`coinData[${i}].coin${coinIndex + 1} = ${data};`);
           }
-          // this.setState({ coinData: coinData });
+          // get full name of this coin
+          coinFullNames[coinIndex] = response.data["Meta Data"]["3. Digital Currency Name"];
         })
         .finally(function() {
           this.setState({ coinData: coinData });
