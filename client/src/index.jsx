@@ -11,6 +11,7 @@ class App extends React.Component {
     super(props);
     this.state = {
       coinData: [],
+      coinFullNames: [],
       wallet: {}
     };
   }
@@ -87,6 +88,7 @@ class App extends React.Component {
         })
         .finally(function() {
           this.setState({ coinData: coinData });
+          this.state.coinFullNames = coinFullNames.slice();
         })
         .catch(function(error) {
           console.log(error);
@@ -130,7 +132,11 @@ class App extends React.Component {
     return (
       <div>
         <h3>Welcome to Cryptex!</h3>
-        <Main coinData={this.state.coinData} wallet={this.state.wallet} />
+        <Main
+          coinData={this.state.coinData}
+          wallet={this.state.wallet}
+          coinFullNames={this.state.coinFullNames}
+        />
         <Wallet wallet={this.state.wallet} />
         <Add />
         <div>

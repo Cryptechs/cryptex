@@ -33,7 +33,11 @@ class Main extends React.Component {
         {this.state.view === "wallet" ? (
           <Graph data={this.props.coinData} />
         ) : (
-          <GraphCoin data={this.props.coinData} coinName={this.state.view} />
+          <GraphCoin
+            data={this.props.coinData}
+            coinName={this.state.view}
+            coinFullNames={this.props.coinFullNames}
+          />
         )}
       </div>
     );
