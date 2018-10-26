@@ -17,27 +17,74 @@ class App extends React.Component {
     };
   }
 
-<<<<<<< HEAD
-  // loadAsync() {
-  //   const firstRequest = await axios.get('https://maps.googleapis.com/maps/api/geocode/json?&address=' + this.props.p1);
-  //   const secondRequest = await axios.get('https://maps.googleapis.com/maps/api/geocode/json?&address=' + this.props.p2);
-  //   const thirdRequest = await axios.get('https://maps.googleapis.com/maps/api/directions/json?origin=place_id:' + firstRequest.data.results.place_id + '&destination=place_id:' + secondRequest.data.results.place_id + '&key=' + 'API-KEY-HIDDEN');
-
-  //   this.setState({
-  //     p1Location: firstRequest.data,
-  //     p2Location: SecondRequest.data,
-  //     route: thirdRequest.data,
-  //   });
-  // }
-=======
   componentDidMount() {
     console.log("Component Mounted");
     var profile = auth0Client.handleAuthentication();
     setTimeout(() => console.log(profile), 5000);
->>>>>>> 573112c146b2a375cb2318e3bc0617b264c11c7c
 
-  componentDidMount() {
-    // Mock coin data
+    // create Mock coin data
+    var {
+      wallet,
+      coinData,
+      mockCoinNames
+    } = this.createMockWalletAndCoinDataAndMockCoinNames();
+    this.setState({ wallet: wallet, coinData: coinData });
+
+    // Get Live data
+    this.getLiveCoinDataAndCoinFullNamesFromAPI(mockCoinNames, coinData);
+  }
+
+  getLiveCoinDataAndCoinFullNamesFromAPI(mockCoinNames, coinData) {
+    let coinFullNames = mockCoinNames.slice();
+    for (let coinIdx = 0; coinIdx < mockCoinNames.length; coinIdx++) {
+      let self = this;
+      axios
+        .get(
+          "https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol=" +
+            mockCoinNames[coinIdx] +
+            "&market=USD&apikey=" +
+            ALPHA_ADVANTAGE_API_KEY
+        )
+        .then(function(response) {
+          // get the crypto ticker name from the response object
+          //  && then look it up in our index of coinNames
+          let coinIndex = mockCoinNames.indexOf(
+            response.data["Meta Data"]["2. Digital Currency Code"]
+          );
+          if (coinIndex === -1) {
+            console.log(
+              "Bad Coinindex for ",
+              response.data["Meta Data"]["2. Digital Currency Code"]
+            );
+          }
+          for (let i = 50; i >= 0; i--) {
+            let data =
+              response.data["Time Series (Digital Currency Daily)"][
+                Object.keys(
+                  response.data["Time Series (Digital Currency Daily)"]
+                )[i]
+              ]["4a. close (USD)"];
+            // Use the index of the coin from the response
+            eval(`coinData[${i}].coin${coinIndex + 1} = ${data};`);
+          }
+          // get full name of this coin
+          coinFullNames[coinIndex] =
+            response.data["Meta Data"]["3. Digital Currency Name"];
+
+          self.setState({
+            wallet: this.state.wallet,
+            coinData: coinData,
+            coinFullNames: coinFullNames.slice()
+          });
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    }
+  }
+
+  createMockWalletAndCoinDataAndMockCoinNames() {
+    // create random data for each coin and create a wallet history
     const coinData = [];
     const walletHistory = [];
     for (let i = 50; i >= 0; i--) {
@@ -54,55 +101,7 @@ class App extends React.Component {
         item.coin1 + item.coin2 + item.coin3 + item.coin4 + item.coin5
       );
     }
-
     let mockCoinNames = ["BTC", "LTC", "ETH", "XRP", "EOS"];
-    let coinFullNames = mockCoinNames.slice();
-    for (let coinIdx = 0; coinIdx < mockCoinNames.length; coinIdx++) {
-      axios
-        .get(
-          "https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol=" +
-            mockCoinNames[coinIdx] +
-            "&market=USD&apikey=" +
-            ALPHA_ADVANTAGE_API_KEY
-        )
-        .then(function(response) {
-          // get the crypto ticker name from the response object
-          //  && then look it up in our index of coinNames
-          let coinIndex = mockCoinNames.indexOf(
-            response.data["Meta Data"]["2. Digital Currency Code"]
-          );
-
-          if (coinIndex === -1) {
-            console.log(
-              "Bad Coinindex for ",
-              response.data["Meta Data"]["2. Digital Currency Code"]
-            );
-          }
-
-          for (let i = 50; i >= 0; i--) {
-            let data =
-              response.data["Time Series (Digital Currency Daily)"][
-                Object.keys(
-                  response.data["Time Series (Digital Currency Daily)"]
-                )[i]
-              ]["4a. close (USD)"];
-
-            // Use the index of the coin from the response
-            eval(`coinData[${i}].coin${coinIndex + 1} = ${data};`);
-          }
-          // get full name of this coin
-          coinFullNames[coinIndex] =
-            response.data["Meta Data"]["3. Digital Currency Name"];
-        })
-        .finally(function() {
-          this.setState({ coinData: coinData });
-          this.state.coinFullNames = coinFullNames.slice();
-        })
-        .catch(function(error) {
-          console.log(error);
-        });
-    }
-
     // Mock wallet data (This is the current total only)
     let wallet = {};
     wallet.coins = [];
@@ -114,9 +113,9 @@ class App extends React.Component {
       });
     }
     wallet.walletHistory = { walletHistory };
-
-    this.setState({ wallet: wallet, coinData: coinData });
+    return { wallet, coinData, mockCoinNames };
   }
+
   createUser() {
     //post(users/create)
   }
