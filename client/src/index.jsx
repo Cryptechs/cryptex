@@ -15,21 +15,19 @@ class App extends React.Component {
     };
   }
 
+  // loadAsync() {
+  //   const firstRequest = await axios.get('https://maps.googleapis.com/maps/api/geocode/json?&address=' + this.props.p1);
+  //   const secondRequest = await axios.get('https://maps.googleapis.com/maps/api/geocode/json?&address=' + this.props.p2);
+  //   const thirdRequest = await axios.get('https://maps.googleapis.com/maps/api/directions/json?origin=place_id:' + firstRequest.data.results.place_id + '&destination=place_id:' + secondRequest.data.results.place_id + '&key=' + 'API-KEY-HIDDEN');
 
-  loadAsync() {
-    const firstRequest = await axios.get('https://maps.googleapis.com/maps/api/geocode/json?&address=' + this.props.p1);
-    const secondRequest = await axios.get('https://maps.googleapis.com/maps/api/geocode/json?&address=' + this.props.p2);
-    const thirdRequest = await axios.get('https://maps.googleapis.com/maps/api/directions/json?origin=place_id:' + firstRequest.data.results.place_id + '&destination=place_id:' + secondRequest.data.results.place_id + '&key=' + 'API-KEY-HIDDEN');
-  
-    this.setState({
-      p1Location: firstRequest.data,
-      p2Location: SecondRequest.data,
-      route: thirdRequest.data,
-    });
-  }
+  //   this.setState({
+  //     p1Location: firstRequest.data,
+  //     p2Location: SecondRequest.data,
+  //     route: thirdRequest.data,
+  //   });
+  // }
 
-  async componentDidMount() {
-
+  componentDidMount() {
     // Mock coin data
     const coinData = [];
     const walletHistory = [];
@@ -84,7 +82,8 @@ class App extends React.Component {
             eval(`coinData[${i}].coin${coinIndex + 1} = ${data};`);
           }
           // get full name of this coin
-          coinFullNames[coinIndex] = response.data["Meta Data"]["3. Digital Currency Name"];
+          coinFullNames[coinIndex] =
+            response.data["Meta Data"]["3. Digital Currency Name"];
         })
         .finally(function() {
           this.setState({ coinData: coinData });
