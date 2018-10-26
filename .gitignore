@@ -4,3 +4,4 @@ bower_components/
 
 build/
 client/dist/bundle.js
+client/config/config.js
