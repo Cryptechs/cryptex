@@ -1,13 +1,9 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import axios from "axios";
 import Wallet from "./components/walletValue.jsx";
 import Main from "./components/main.jsx";
 import Add from "./components/add.jsx";
 import { isAbsolute } from "path";
-//import { BrowserRouter } from "react-router-dom";
-
-// comment testing gitignore
 
 class App extends React.Component {
   constructor(props) {
@@ -93,4 +89,3 @@ function giveRandomAlpha(numChars) {
 }
 
 export default App;
-//ReactDOM.render(<App />, document.getElementById("app"));
