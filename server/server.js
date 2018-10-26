@@ -1,7 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 const axios = require('axios')
-
+var path = require('path')
 var app = express();
 
 app.use(express.static(__dirname + '/../client/dist'));
@@ -31,7 +31,12 @@ app.patch('/users/logout')
 
 
 
+app.get('/*', (err, res) => {
+    console.log('here!')
 
+    res.sendFile(path.join(__dirname, '../client/dist/index.html'))
+
+})
 
 
 

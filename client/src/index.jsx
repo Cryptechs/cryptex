@@ -1,13 +1,10 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import axios from "axios";
 import Wallet from "./components/wallet.jsx";
 import Main from "./components/main.jsx";
 import Add from "./components/add.jsx";
 import { isAbsolute } from "path";
 import ALPHA_ADVANTAGE_API_KEY from "../config/config.js";
-
-// comment testing gitignore
 
 class App extends React.Component {
   constructor(props) {
@@ -141,4 +138,4 @@ function giveRandomAlpha(numChars) {
   return res;
 }
 
-ReactDOM.render(<App />, document.getElementById("app"));
+export default App;
