@@ -5,6 +5,7 @@ import Main from "./components/main.jsx";
 import Add from "./components/add.jsx";
 import { isAbsolute } from "path";
 import ALPHA_ADVANTAGE_API_KEY from "../config/config.js";
+import auth0Client from "./authZero";
 
 class App extends React.Component {
   constructor(props) {
@@ -16,6 +17,7 @@ class App extends React.Component {
     };
   }
 
+<<<<<<< HEAD
   // loadAsync() {
   //   const firstRequest = await axios.get('https://maps.googleapis.com/maps/api/geocode/json?&address=' + this.props.p1);
   //   const secondRequest = await axios.get('https://maps.googleapis.com/maps/api/geocode/json?&address=' + this.props.p2);
@@ -27,6 +29,12 @@ class App extends React.Component {
   //     route: thirdRequest.data,
   //   });
   // }
+=======
+  componentDidMount() {
+    console.log("Component Mounted");
+    var profile = auth0Client.handleAuthentication();
+    setTimeout(() => console.log(profile), 5000);
+>>>>>>> 573112c146b2a375cb2318e3bc0617b264c11c7c
 
   componentDidMount() {
     // Mock coin data
@@ -131,6 +139,7 @@ class App extends React.Component {
   render() {
     return (
       <div>
+        <button onClick={auth0Client.signOut}>Logout</button>
         <h3>Welcome to Cryptex!</h3>
         <Main
           coinData={this.state.coinData}
