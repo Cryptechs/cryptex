@@ -1,12 +1,18 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Signup = props => {
   return (
     <div className="signup">
+      <Link to={`/login`}>Log in to existing account</Link>
+
       <form>
-        <input type="text">Create a UserName:</input>
-        <input type="password">Create a Password</input>
-        <input type="submit">Create Account</input>
+        Create a UserName:
+        <input type="text" />
+        Create a Password
+        <input type="password" />
+        Create Account
+        <input type="submit" />
       </form>
     </div>
   );
