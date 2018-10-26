@@ -5,6 +5,7 @@ import Main from "./components/main.jsx";
 import Add from "./components/add.jsx";
 import { isAbsolute } from "path";
 import ALPHA_ADVANTAGE_API_KEY from "../config/config.js";
+import auth0Client from "./authZero";
 
 class App extends React.Component {
   constructor(props) {
@@ -17,6 +18,8 @@ class App extends React.Component {
 
   componentDidMount() {
     console.log("Component Mounted");
+    var profile = auth0Client.handleAuthentication();
+    setTimeout(() => console.log(profile), 5000);
 
     // Mock coin data
     const coinData = [];
@@ -118,6 +121,7 @@ class App extends React.Component {
   render() {
     return (
       <div>
+        <button onClick={auth0Client.signOut}>Logout</button>
         <h3>Welcome to Cryptex!</h3>
         <Main coinData={this.state.coinData} wallet={this.state.wallet} />
         <Wallet wallet={this.state.wallet} />
