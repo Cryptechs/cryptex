@@ -278,14 +278,16 @@ class App extends React.Component {
           wallet={this.state.wallet}
           coinFullNames={this.state.coinFullNames}
         />
-        <Wallet
-          wallet={this.state.wallet}
-          coinFullNames={this.state.coinFullNames}
-        />
+        <div>
         <Add
           handleUpdateCoinAmounts={this.handleUpdateCoinAmounts}
           coinFullNames={this.state.coinFullNames}
         />
+        <Wallet
+          wallet={this.state.wallet}
+          coinFullNames={this.state.coinFullNames}
+        />
+        </div>
         <div>
           <footer>Micah Weiss, James Dempsey, Chris Athanas</footer>
         </div>
@@ -298,14 +300,6 @@ class App extends React.Component {
       </div>
     );
   }
-}
-
-function giveRandomAlpha(numChars) {
-  let res = "";
-  for (let i = 0; i < numChars; i++) {
-    res += String.fromCharCode(65 + Math.random() * 26);
-  }
-  return res;
 }
 
 export default App;
