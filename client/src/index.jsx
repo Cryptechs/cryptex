@@ -33,17 +33,17 @@ class App extends React.Component {
       console.log("im here");
     }
 
-    // // create Mock coin data
+    // // create Mock coin data -- Leave here for testing
     // var {
     //   wallet,
     //   coinsData,
     //   coinNames
     // } = this.createMockWalletAndCoinsDataAndCoinNames();
 
-    var wallet = this.retrieveWallet(wallet => {
-      this.getLiveCoinDataAndCoinsFullNamesFromAPI(coinNames);
+    this.retrieveWallet(wallet => {
+      this.getLiveCoinDataAndCoinFullNamesFromAPI(coinNames);
 
-      debugger; //look for wallet
+      //look for wallet
       this.setState({
         wallet: wallet
       });
@@ -59,21 +59,25 @@ class App extends React.Component {
     eval(`wallet.coins[${coinNameIdx}].amount = ${amount}`);
 
     //Update the last entry for the walletHistory to reflect new amount of coins
-    eval(`wallet.walletHistory[50].coin${coinNameIdx + 1}Amount = ${amount}`);
+    let updateTimeStampIdx = wallet.walletHistory.length - 1;
     eval(
-      `wallet.walletHistory[50].coin${coinNameIdx +
-        1}TotalUSD = ${amount} * this.state.wallet.walletHistory[50].coin${coinNameIdx +
+      `wallet.walletHistory[updateTimeStampIdx].coin${coinNameIdx +
+        1}Amount = ${amount}`
+    );
+    eval(
+      `wallet.walletHistory[updateTimeStampIdx].coin${coinNameIdx +
+        1}TotalUSD = ${amount} * this.state.wallet.walletHistory[updateTimeStampIdx].coin${coinNameIdx +
         1}Value`
     );
 
     this.state.wallet.walletHistory = this.state.wallet.walletHistory.slice();
     this.setState({ wallet: wallet });
 
-    // TODO send this new wallet to the server
-    // this.setCoins(wallet.coin1, )
+    // send this new wallet to the server
+    this.saveWallet(wallet);
   }
 
-  getLiveCoinDataAndCoinsFullNamesFromAPI(coinNames) {
+  getLiveCoinDataAndCoinFullNamesFromAPI(coinNames) {
     let coinFullNames = coinNames.slice();
     let coinsData = [];
     for (let coinIdx = 0; coinIdx < coinNames.length; coinIdx++) {
@@ -132,7 +136,7 @@ class App extends React.Component {
   createUser(callback) {
     //mjw- untested
     self = this;
-    debugger;
+
     axios
       .post("/users/create", {
         username: localStorage.name
@@ -157,10 +161,7 @@ class App extends React.Component {
           console.log("No existing wallet. Creating new Wallet");
           self.createUser(callback);
         } else {
-          //set state stuff here
-          debugger;
           console.log("retrieveWallet() response.data=", response.data);
-          //return wallet here
           var serverWallet = response.data;
           var wallet = self.convertServerWalletToClientWallet(serverWallet);
           callback(wallet);
@@ -178,9 +179,9 @@ class App extends React.Component {
 
     //load server wallet timestamps into client wallet.walletHistory;
     const walletHistory = [];
-    for (let i = serverWalletLength; i >= 0; i--) {
+    for (let i = serverWalletLength - 1; i >= 0; i--) {
       walletHistory.push({
-        timeStamp: serverWallet[i].timeStamp,
+        timeStamp: serverWallet[i].timestamp,
         coin1Name: coinNames[0],
         coin2Name: coinNames[1],
         coin3Name: coinNames[2],
@@ -203,35 +204,37 @@ class App extends React.Component {
         coin5TotalUSD: serverWallet[i].c5_value * serverWallet[i].c5_amount
       });
     }
-    wallet.walletHistry = walletHistory.slice();
+    wallet.walletHistory = walletHistory.slice();
 
     //load server wallet last timestamp data as the current wallet.
     wallet.coins = [];
     for (let i = 0; i < 5; i++) {
       wallet.coins.push({
-        amount: eval(`walletHistory[serverWalletLength].coin${i + 1}Amount`),
-        value: eval(`walletHistory[serverWalletLength].coin${i + 1}Value`),
+        amount: eval(`walletHistory[serverWalletLength-1].coin${i + 1}Amount`),
+        value: eval(`walletHistory[serverWalletLength-1].coin${i + 1}Value`),
         name: coinNames[i]
       });
     }
+    wallet.timeStamp = wallet.walletHistory.timeStamp[serverWalletLength - 1];
 
-    debugger;
     return wallet;
   }
 
-  setCoins(c1, c2, c3, c4, c5) {
+  saveWallet(wallet) {
     //mjw- untested
+    let self = this;
     axios
       .patch("/api/wallet/" + localStorage.name, {
-        c1: c1,
-        c2: c2,
-        c3: c3,
-        c4: c4,
-        c5: c5
+        c1: wallet.coins[0].amount,
+        c2: wallet.coins[1].amount,
+        c3: wallet.coins[2].amount,
+        c4: wallet.coins[3].amount,
+        c5: wallet.coins[4].amount,
+        timestamp: wallet.timeStamp
       })
       .then(function(response) {
-        console.log("Did we patch it?");
-        console.log(response);
+        console.log("saveWallet: patched, response=", response);
+        //self.setState({wallet:wallet});
       })
       .catch(function(error) {
         console.log(error);
@@ -272,6 +275,7 @@ class App extends React.Component {
     );
   }
 
+  // For mock and testing
   createMockWalletAndCoinsDataAndCoinNames() {
     // create random data for each coin and create a wallet history
     const coinsData = this.createMockCoinsData();
@@ -280,6 +284,7 @@ class App extends React.Component {
     return { wallet, coinsData, coinNames };
   }
 
+  // For mock and testing
   createWalletFromCoinsData(coinsData, coinNames) {
     const walletHistory = [];
     for (let i = 50; i >= 0; i--) {
@@ -339,6 +344,7 @@ class App extends React.Component {
     return wallet;
   }
 
+  // for mock and testing
   createMockCoinsData() {
     const coinsData = [];
     for (let i = 50; i >= 0; i--) {
