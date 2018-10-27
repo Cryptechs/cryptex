@@ -6,6 +6,8 @@ import Add from "./components/add.jsx";
 import { isAbsolute } from "path";
 import ALPHA_ADVANTAGE_API_KEY from "../config/config.js";
 import auth0Client from "./authZero";
+import { Link, Redirect } from "react-router-dom";
+import { create } from "domain";
 
 const coinNames = ["BTC", "LTC", "ETH", "XRP", "EOS"];
 
@@ -13,7 +15,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      coinsData: [],
+      coinData: [],
       coinFullNames: [],
       wallet: {}
     };
@@ -22,8 +24,13 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    var profile = auth0Client.handleAuthentication();
-    setTimeout(() => console.log(profile), 5000);
+    console.log("Component Mounted");
+    auth0Client.handleAuthentication();
+    //console.log(localStorage, localStorage.profile);
+    console.log(auth0Client.isAuthenticated());
+    if (!auth0Client.isAuthenticated()) {
+      console.log("im here");
+    }
 
     // create Mock coin data
     var {
@@ -202,30 +209,63 @@ class App extends React.Component {
     return coinsData;
   }
 
-  createUser() {
-    //post(users/create)
+  //This method is called inside retrieve wallet if no wallets are found. 
+  createUser() { //mjw- untested
+    axios.post("/users/create", {
+      username: localStorage.name
+    })
+    .then(function(response){
+      console.log("new user created");
+      //you can set state stuff here
+      //or alternatively you can invoke retrieveWallet
+    });
   }
-  verifyUser() {
-    //get(/users)
-  }
-  logout() {
-    //patch or post(/users/logout)
-  }
-  retrieveWallet(user) {
+ 
+  retrieveWallet() { //mjw- untested
     //get (path = '/api/wallet/' +userID)
+    axios
+      .get("/api/wallets/" + localStorage.name)
+      .then(function(response) {
+        console.log('GET wallet successful:');
+        if (response.body === ''){
+          console.log('No existing wallets. Creating new Wallet');
+          this.createUser();
+        } else{
+          console.log('Here is you wallet');
+          //set state stuff here
+        }
+        
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
   }
-  getCoinHistory(coin) {
-    //mjw- is this still used?
-  }
-  setCoins() {
-    //patch(/wallet/get)
-    //axios
+
+  setCoins(c1, c2, c3, c4, c5) { //mjw- untested
+    axios
+      .patch("/api/wallets/" + localStorage.name, {
+        c1: c1,
+        c2: c2,
+        c3: c3,
+        c4: c4,
+        c5: c5
+      })
+      .then(function(response) {
+        console.log("Did we patch it?");
+        console.log(response);
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
   }
 
   render() {
-    return (
+    return auth0Client.isAuthenticated() ? (
       <div>
-        <button onClick={auth0Client.signOut}>Logout</button>
+        <Link to="/" onClick={auth0Client.signOut}>
+          Logout
+        </Link>
+        <button onClick={auth0Client.handleAuthentication}>Click me</button>
         <h3>Welcome to Cryptex!</h3>
         <Main
           coinsData={this.state.coinsData}
@@ -243,6 +283,12 @@ class App extends React.Component {
         <div>
           <footer>Micah Weiss, James Dempsey, Chris Athanas</footer>
         </div>
+      </div>
+    ) : (
+      <div>
+        <div>Welcome to your Crypto Profile Management Client!</div>
+        <Link to="/home">See your profile here</Link> {"<------->"}
+        <Link to="/">Link not working? log in here</Link>
       </div>
     );
   }

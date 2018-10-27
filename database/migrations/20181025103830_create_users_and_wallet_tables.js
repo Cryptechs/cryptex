@@ -5,7 +5,6 @@ exports.up = function(knex, Promise) {
     .createTable('users', function(table){
         table.increments();
         table.string('username').unique().notNullable();
-        table.string('password').notNullable();
     })
     
     //history of coin values same for all users and wallets (if we want to run call from server)
@@ -21,7 +20,7 @@ exports.up = function(knex, Promise) {
     //the wallet info and amount of coins currently in the wallet
     .createTable('wallets', function(table) { 
         table.increments();
-        table.integer('user_id').references('id').inTable('users');
+        table.string('user_id').references('username').inTable('users');
         table.string('timestamp').references('time_value').inTable('coin_values');
         table.float('c1_amount', 12, 4).defaultTo(0);
         table.float('c2_amount', 12, 4).defaultTo(0);
