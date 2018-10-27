@@ -7,7 +7,7 @@
     "react-dev": "webpack -d --watch",
     "server-dev": "nodemon server/server.js",
     "start": "node server/server.js",
-    "heroku-postbuild": "webpack -b"
+    "heroku-postbuild": "webpack"
   },
   "repository": {
     "type": "git",
