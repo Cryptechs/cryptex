@@ -110,17 +110,18 @@ class App extends React.Component {
   verifyUser() {
     //get(/users)
   }
-  addCoins() {
-    //patch(/wallet/get)
-  }
-  retrieveWallet(user) {
-    //get(/api/coins)
-  }
-  getCoinHistory(coin) {
-    //get (/api)
-  }
   logout() {
     //patch or post(/users/logout)
+  }
+  retrieveWallet(user) {
+    //get (path = '/api/wallet/' +userID)
+  }
+  getCoinHistory(coin) {
+    //mjw- is this still used?
+  }
+  setCoins() {
+    //patch(/wallet/get)
+    //axios
   }
 
   render() {
