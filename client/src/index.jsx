@@ -46,15 +46,24 @@ class App extends React.Component {
     console.log("handleUpdateCoinAmounts=", coinUIName, amount);
     let coinNameIdx = Number(coinUIName.split(" ")[1]) - 1; //'Coin 1'  ==> coins[0]
 
-    debugger;
+    // set the current number of coins to the new amount of coins
     let wallet = this.state.wallet;
     eval(`this.state.wallet.coins[${coinNameIdx}].amount = ${amount}`);
+
+    //Update the last entry for the walletHistory to reflect new amount of coins
+    eval(
+      `this.state.wallet.walletHistory[50].coin${coinNameIdx +
+        1}Amount = ${amount}`
+    );
+    eval(
+      `this.state.wallet.walletHistory[50].coin${coinNameIdx +
+        1}TotalUSD = ${amount} * this.state.wallet.walletHistory[50].coin${coinNameIdx +
+        1}Value`
+    );
 
     this.setState({ wallet: wallet });
     // TODO send this new wallet to the server
   }
-
-  // amount: eval(`walletHistory[50].coin${i + 1}Amount`),
 
   getLiveCoinDataAndCoinsFullNamesFromAPI(mockCoinNames, coinsData) {
     let coinFullNames = mockCoinNames.slice();
