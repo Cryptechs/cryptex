@@ -1,5 +1,6 @@
 import auth0 from 'auth0-js';
 
+
 class Auth {
     constructor() {
         this.auth0 = new auth0.WebAuth({
@@ -29,39 +30,53 @@ class Auth {
     }
 
     handleAuthentication() {
-        return new Promise((resolve, reject) => {
-            this.auth0.parseHash((err, authResult) => {
-                if (err) return reject(err);
-                if (!authResult || !authResult.idToken) {
-                    return reject(err);
-                }
-                this.idToken = authResult.idToken;
-                this.profile = authResult.idTokenPayload;
-                // set the time that the id token will expire at
-                this.expiresAt = authResult.expiresIn * 1000 + new Date().getTime();
-                resolve(this.getProfile());
-            });
-        })
+        this.auth0.parseHash((err, authResult) => {
+            if (authResult && authResult.accessToken && authResult.idToken) {
+                this.setSession(authResult);
+                console.log(authResult)
+                //history.replace('/home');
+            } else if (err) {
+                // history.replace('/home');
+                console.log(err);
+            }
+        });
+    }
+    setSession(authResult) {
+        // Set the time that the Access Token will expire at
+        let expiresAt = JSON.stringify((authResult.expiresIn * 1000) + new Date().getTime());
+        localStorage.setItem('access_token', authResult.accessToken);
+        localStorage.setItem('id_token', authResult.idToken);
+        localStorage.setItem('expires_at', expiresAt);
+        localStorage.setItem('name', authResult.idTokenPayload.name);
+        // navigate to the home route
+        //history.replace('/home');
     }
 
     isAuthenticated() {
-        return new Date().getTime() < this.expiresAt;
+        // Check whether the current time is past the 
+        // Access Token's expiry time
+        let expiresAt = JSON.parse(localStorage.getItem('expires_at'));
+        return new Date().getTime() < expiresAt;
     }
 
     signIn() {
         this.auth0.authorize();
+        this.handleAuthentication();
     }
 
     signOut() {
-        // clear id token, profile, and expiration
-        console.log('in auth0')
-        console.log(localStorage)
-        localStorage.profile = 'undefined';
+        // Clear Access Token and ID Token from local storage
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('id_token');
+        localStorage.removeItem('expires_at');
+        localStorage.removeItem('name')
         this.idToken = null;
         this.profile = null;
         this.expiresAt = null;
         this.auth0.logout()
 
+        // navigate to the home route
+        //history.replace('/');
     }
 }
 

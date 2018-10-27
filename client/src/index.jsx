@@ -6,7 +6,7 @@ import Add from "./components/add.jsx";
 import { isAbsolute } from "path";
 import ALPHA_ADVANTAGE_API_KEY from "../config/config.js";
 import auth0Client from "./authZero";
-import axios from "axios";
+import { Link, Redirect } from "react-router-dom";
 
 class App extends React.Component {
   constructor(props) {
@@ -19,12 +19,12 @@ class App extends React.Component {
 
   componentDidMount() {
     console.log("Component Mounted");
+    auth0Client.handleAuthentication();
     //console.log(localStorage, localStorage.profile);
-    if (localStorage.profile === "undefined") {
+    console.log(auth0Client.isAuthenticated());
+    if (!auth0Client.isAuthenticated()) {
+      console.log("im here");
     }
-    setTimeout(() => {
-      console.log(localStorage, "local storage after");
-    }, 5000);
 
     // Mock coin data
     const coinData = [];
@@ -125,9 +125,12 @@ class App extends React.Component {
   }
 
   render() {
-    return (
+    return auth0Client.isAuthenticated() ? (
       <div>
-        <button onClick={auth0Client.signOut}>Logout</button>
+        <Link to="/" onClick={auth0Client.signOut}>
+          Logout
+        </Link>
+        <button onClick={auth0Client.handleAuthentication}>Click me</button>
         <h3>Welcome to Cryptex!</h3>
         <Main coinData={this.state.coinData} wallet={this.state.wallet} />
         <Wallet wallet={this.state.wallet} />
@@ -135,6 +138,12 @@ class App extends React.Component {
         <div>
           <footer>Micah Weiss, James Dempsey, Chris Athanas</footer>
         </div>
+      </div>
+    ) : (
+      <div>
+        <div>Welcome to your Crypto Profile Management Client!</div>
+        <Link to="/home">See your profile here</Link> {"<------->"}
+        <Link to="/">Link not working? log in here</Link>
       </div>
     );
   }
