@@ -17,6 +17,8 @@ class App extends React.Component {
       coinFullNames: [],
       wallet: {}
     };
+
+    this.handleUpdateCoinAmounts = this.handleUpdateCoinAmounts.bind(this);
   }
 
   componentDidMount() {
@@ -40,6 +42,20 @@ class App extends React.Component {
     this.getLiveCoinDataAndCoinsFullNamesFromAPI(coinNames, coinsData);
   }
 
+  handleUpdateCoinAmounts(coinUIName, amount) {
+    console.log("handleUpdateCoinAmounts=", coinUIName, amount);
+    let coinNameIdx = Number(coinUIName.split(" ")[1]) - 1; //'Coin 1'  ==> coins[0]
+
+    debugger;
+    let wallet = this.state.wallet;
+    eval(`this.state.wallet.coins[${coinNameIdx}].amount = ${amount}`);
+
+    this.setState({ wallet: wallet });
+    // TODO send this new wallet to the server
+  }
+
+  // amount: eval(`walletHistory[50].coin${i + 1}Amount`),
+
   getLiveCoinDataAndCoinsFullNamesFromAPI(mockCoinNames, coinsData) {
     let coinFullNames = mockCoinNames.slice();
     for (let coinIdx = 0; coinIdx < mockCoinNames.length; coinIdx++) {
@@ -52,7 +68,8 @@ class App extends React.Component {
             ALPHA_ADVANTAGE_API_KEY
         )
         .then(function(response) {
-          //FIX - check for errors from AlphaAdvantage
+          //TODO - check for errors from AlphaAdvantage
+          console.log("AlphaAdvantage response:", response.data);
 
           // get the crypto ticker name from the response object
           //  && then look it up in our index of coinNames
@@ -210,7 +227,10 @@ class App extends React.Component {
           wallet={this.state.wallet}
           coinFullNames={this.state.coinFullNames}
         />
-        <Add />
+        <Add
+          handleUpdateCoinAmounts={this.handleUpdateCoinAmounts}
+          coinFullNames={this.state.coinFullNames}
+        />
         <div>
           <footer>Micah Weiss, James Dempsey, Chris Athanas</footer>
         </div>
