@@ -16,9 +16,8 @@ const Wallet = props => {
         {wallet.coins.map((i, idx) => {
           return (
             <div key={idx}>
-              Coin Name: {coinFullNames[idx]} [{i.name}] :
-              {i.amount.toPrecision(4)} * ${i.value.toPrecision(4)} = $
-              {(i.amount * i.value).toPrecision(5)}
+              {coinFullNames[idx]} [{i.name}] :{i.amount.toPrecision(4)} * $
+              {i.value.toPrecision(4)} = ${(i.amount * i.value).toPrecision(5)}
             </div>
           );
         })}

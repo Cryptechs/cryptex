@@ -7,7 +7,10 @@ const knex = require('../database/knex')
 const jwt = require('express-jwt');
 const jwtAuthz = require('express-jwt-authz');
 const jwksRsa = require('jwks-rsa');
-
+let port = process.env.PORT;
+if (port == null || port == "") {
+    port = 3000;
+}
 
 
 app.use(express.static(__dirname + '/../client/dist'));
@@ -41,19 +44,21 @@ const checkJwt = jwt({
 
 
 //createUser
-app.post('/users/create', (req,res)=>{
-    knex('users').insert({username: req.body.username})
-        .then( ()=>{
+app.post('/users/create', (req, res) => {
+    knex('users').insert({
+            username: req.body.username
+        })
+        .then(() => {
             console.log('added username', req.body.username)
             knex.raw('SELECT time_value FROM coin_values ORDER BY time_value DESC LIMIT 1;')
-                .then((results)=>{
+                .then((results) => {
                     knex('wallets').insert({
-                        timestamp: results.rows[0].time_value,
-                        user_id: req.body.username
-                    }) //currencies all default to zero
-                        .then(()=>{
+                            timestamp: results.rows[0].time_value,
+                            user_id: req.body.username
+                        }) //currencies all default to zero
+                        .then(() => {
                             console.log('wallet created');
-                            res.send('created user', req.body.username, 'with a zero wallet at', results.rows[0].time_value );
+                            res.send('created user', req.body.username, 'with a zero wallet at', results.rows[0].time_value);
                         });
                 });
         })
@@ -120,6 +125,6 @@ app.get('/*', (err, res) => {
 
 
 
-app.listen(3000, function () {
-    console.log('listening on port 3000!');
+app.listen(port, function () {
+    console.log('Listening on port ' + port + '!');
 });
