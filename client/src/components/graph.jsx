@@ -32,50 +32,48 @@ const Graph = props => {
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
+          <XAxis dataKey="timeStamp" />
           <YAxis />
           <Tooltip />
           <Area
             type="monotone"
-            dataKey="coin1"
+            dataKey="coin1TotalUSD"
+            name={props.coinFullNames[0] + "(USD)"}
             stackId="1"
             stroke="#8884d8"
             fill="#8884d8"
           />
           <Area
             type="monotone"
-            dataKey="coin2"
+            dataKey="coin2TotalUSD"
+            name={props.coinFullNames[1] + "(USD)"}
             stackId="1"
             stroke="#82ca9d"
             fill="#82ca9d"
           />
           <Area
             type="monotone"
-            dataKey="coin3"
+            dataKey="coin3TotalUSD"
+            name={props.coinFullNames[2] + "(USD)"}
             stackId="1"
             stroke="#ffc658"
             fill="#ffc658"
           />
           <Area
             type="monotone"
-            dataKey="coin4"
+            dataKey="coin4TotalUSD"
+            name={props.coinFullNames[3] + "(USD)"}
             stackId="1"
             stroke="#00c6FF"
             fill="#00c6FF"
           />
           <Area
             type="monotone"
-            dataKey="coin5"
+            dataKey="coin5TotalUSD"
+            name={props.coinFullNames[4] + "(USD)"}
             stackId="1"
             stroke="#66c600"
             fill="#66c600"
-          />
-          <Area
-            type="monotone"
-            dataKey="amt"
-            stackId="1"
-            stroke="#66c600"
-            fill="#ffc6ff"
           />
         </AreaChart>
       </div>
