@@ -15,11 +15,26 @@ class Add extends React.Component {
             coinUIName="coin 1"
             coinFullName={this.props.coinFullNames[0]}
           />
-          <button>Coin 1 add</button> +form input
-          <button>Coin 2 add</button> +form input
-          <button>Coin 3 add</button> +form input
-          <button>Coin 4 add</button> +form input
-          <button>Coin 5 add</button> +form input
+          <CoinAmountForm
+            handleUpdateCoinAmounts={this.props.handleUpdateCoinAmounts}
+            coinUIName="coin 2"
+            coinFullName={this.props.coinFullNames[1]}
+          />
+          <CoinAmountForm
+            handleUpdateCoinAmounts={this.props.handleUpdateCoinAmounts}
+            coinUIName="coin 3"
+            coinFullName={this.props.coinFullNames[2]}
+          />
+          <CoinAmountForm
+            handleUpdateCoinAmounts={this.props.handleUpdateCoinAmounts}
+            coinUIName="coin 4"
+            coinFullName={this.props.coinFullNames[3]}
+          />
+          <CoinAmountForm
+            handleUpdateCoinAmounts={this.props.handleUpdateCoinAmounts}
+            coinUIName="coin 5"
+            coinFullName={this.props.coinFullNames[4]}
+          />
         </div>
       </div>
     );
