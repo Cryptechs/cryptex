@@ -360,14 +360,98 @@ class App extends React.Component {
     }
     return coinsData;
   }
-}
+<<<<<<< HEAD
+=======
 
-function giveRandomAlpha(numChars) {
-  let res = "";
-  for (let i = 0; i < numChars; i++) {
-    res += String.fromCharCode(65 + Math.random() * 26);
+  //This method is called inside retrieve wallet if no wallets are found.
+  createUser() {
+    //mjw- untested
+    axios
+      .post("/users/create", {
+        username: localStorage.name
+      })
+      .then(function(response) {
+        console.log("new user created");
+        //you can set state stuff here
+        //or alternatively you can invoke retrieveWallet
+      });
   }
-  return res;
+
+  retrieveWallet() {
+    //mjw- untested
+    //get (path = '/api/wallet/' +userID)
+    axios
+      .get("/api/wallets/" + localStorage.name)
+      .then(function(response) {
+        console.log("GET wallet successful:");
+        if (response.body === "") {
+          console.log("No existing wallets. Creating new Wallet");
+          this.createUser();
+        } else {
+          console.log("Here is you wallet");
+          //set state stuff here
+        }
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
+  }
+
+  setCoins(c1, c2, c3, c4, c5) {
+    //mjw- untested
+    axios
+      .patch("/api/wallets/" + localStorage.name, {
+        c1: c1,
+        c2: c2,
+        c3: c3,
+        c4: c4,
+        c5: c5
+      })
+      .then(function(response) {
+        console.log("Did we patch it?");
+        console.log(response);
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
+  }
+
+  render() {
+    return auth0Client.isAuthenticated() ? (
+      <div>
+        <Link to="/" onClick={auth0Client.signOut}>
+          Logout
+        </Link>
+        <button onClick={auth0Client.handleAuthentication}>Click me</button>
+        <h3>Welcome to Cryptex!</h3>
+        <Main
+          coinsData={this.state.coinsData}
+          wallet={this.state.wallet}
+          coinFullNames={this.state.coinFullNames}
+        />
+        <div>
+        <Add
+          handleUpdateCoinAmounts={this.handleUpdateCoinAmounts}
+          coinFullNames={this.state.coinFullNames}
+        />
+        <Wallet
+          wallet={this.state.wallet}
+          coinFullNames={this.state.coinFullNames}
+        />
+        </div>
+        <div>
+          <footer>Micah Weiss, James Dempsey, Chris Athanas</footer>
+        </div>
+      </div>
+    ) : (
+      <div>
+        <div>Welcome to your Crypto Profile Management Client!</div>
+        <Link to="/home">See your profile here</Link> {"<------->"}
+        <Link to="/">Link not working? log in here</Link>
+      </div>
+    );
+  }
+>>>>>>> 0141960c2238899ba4bca539bf76da31dc84ec7e
 }
 
 export default App;
