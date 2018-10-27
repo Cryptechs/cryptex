@@ -15,6 +15,8 @@ import {
 } from "recharts";
 
 const GraphCoin = props => {
+  // Get the coin name incdex for the coin we are drawing
+  let coinNumber = Number(props.coinName.charAt(props.coinName.length - 1) - 1);
   return (
     <div className="graph">
       <AreaChart
@@ -35,6 +37,7 @@ const GraphCoin = props => {
         <Area
           type="monotone"
           dataKey={props.coinName}
+          name={props.coinFullNames[coinNumber] + "(USD)"}
           stackId="1"
           stroke="#8884d8"
           fill="#8884d8"
