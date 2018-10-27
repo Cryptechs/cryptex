@@ -8,6 +8,7 @@ import ALPHA_ADVANTAGE_API_KEY from "../config/config.js";
 import auth0Client from "./authZero";
 import { Link, Redirect } from "react-router-dom";
 import { create } from "domain";
+import { runInThisContext } from "vm";
 
 const coinNames = ["BTC", "LTC", "ETH", "XRP", "EOS"];
 
@@ -19,12 +20,14 @@ class App extends React.Component {
       coinFullNames: [],
       wallet: {}
     };
+
+    this.handleUpdateCoinAmounts = this.handleUpdateCoinAmounts.bind(this);
   }
 
   componentDidMount() {
     console.log("Component Mounted");
     auth0Client.handleAuthentication();
-    //console.log(localStorage, localStorage.profile);
+    // console.log(localStorage, localStorage.profile);
     console.log(auth0Client.isAuthenticated());
     if (!auth0Client.isAuthenticated()) {
       console.log("im here");
@@ -47,6 +50,31 @@ class App extends React.Component {
     this.getLiveCoinDataAndCoinsFullNamesFromAPI(coinNames, coinsData);
   }
 
+  handleUpdateCoinAmounts(coinUIName, amount) {
+    console.log("handleUpdateCoinAmounts=", coinUIName, amount);
+    let coinNameIdx = Number(coinUIName.split(" ")[1]) - 1; //'Coin 1'  ==> coins[0]
+
+    // set the current number of coins to the new amount of coins
+    let wallet = this.state.wallet;
+    eval(`this.state.wallet.coins[${coinNameIdx}].amount = ${amount}`);
+
+    //Update the last entry for the walletHistory to reflect new amount of coins
+    eval(
+      `this.state.wallet.walletHistory[50].coin${coinNameIdx +
+        1}Amount = ${amount}`
+    );
+    eval(
+      `this.state.wallet.walletHistory[50].coin${coinNameIdx +
+        1}TotalUSD = ${amount} * this.state.wallet.walletHistory[50].coin${coinNameIdx +
+        1}Value`
+    );
+
+    this.state.wallet.walletHistory = this.state.wallet.walletHistory.slice();
+
+    this.setState({ wallet: wallet });
+    // TODO send this new wallet to the server
+  }
+
   getLiveCoinDataAndCoinsFullNamesFromAPI(mockCoinNames, coinsData) {
     let coinFullNames = mockCoinNames.slice();
     for (let coinIdx = 0; coinIdx < mockCoinNames.length; coinIdx++) {
@@ -59,7 +87,8 @@ class App extends React.Component {
             ALPHA_ADVANTAGE_API_KEY
         )
         .then(function(response) {
-          //FIX - check for errors from AlphaAdvantage
+          //TODO - check for errors from AlphaAdvantage
+          console.log("AlphaAdvantage response:", response.data);
 
           // get the crypto ticker name from the response object
           //  && then look it up in our index of coinNames
@@ -183,39 +212,42 @@ class App extends React.Component {
     return coinsData;
   }
 
-  //This method is called inside retrieve wallet if no wallets are found. 
-  createUser() { //mjw- untested
-    axios.post("/users/create", {
-      username: localStorage.name
-    })
-    .then(function(response){
-      console.log("new user created");
-      //you can set state stuff here
-      //or alternatively you can invoke retrieveWallet
-    });
+  //This method is called inside retrieve wallet if no wallets are found.
+  createUser() {
+    //mjw- untested
+    axios
+      .post("/users/create", {
+        username: localStorage.name
+      })
+      .then(function(response) {
+        console.log("new user created");
+        //you can set state stuff here
+        //or alternatively you can invoke retrieveWallet
+      });
   }
- 
-  retrieveWallet() { //mjw- untested
+
+  retrieveWallet() {
+    //mjw- untested
     //get (path = '/api/wallet/' +userID)
     axios
       .get("/api/wallets/" + localStorage.name)
       .then(function(response) {
-        console.log('GET wallet successful:');
-        if (response.body === ''){
-          console.log('No existing wallets. Creating new Wallet');
+        console.log("GET wallet successful:");
+        if (response.body === "") {
+          console.log("No existing wallets. Creating new Wallet");
           this.createUser();
-        } else{
-          console.log('Here is you wallet');
+        } else {
+          console.log("Here is you wallet");
           //set state stuff here
         }
-        
       })
       .catch(function(error) {
         console.log(error);
       });
   }
 
-  setCoins(c1, c2, c3, c4, c5) { //mjw- untested
+  setCoins(c1, c2, c3, c4, c5) {
+    //mjw- untested
     axios
       .patch("/api/wallets/" + localStorage.name, {
         c1: c1,
@@ -250,7 +282,10 @@ class App extends React.Component {
           wallet={this.state.wallet}
           coinFullNames={this.state.coinFullNames}
         />
-        <Add />
+        <Add
+          handleUpdateCoinAmounts={this.handleUpdateCoinAmounts}
+          coinFullNames={this.state.coinFullNames}
+        />
         <div>
           <footer>Micah Weiss, James Dempsey, Chris Athanas</footer>
         </div>
