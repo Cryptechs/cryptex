@@ -7,6 +7,7 @@ import { isAbsolute } from "path";
 import ALPHA_ADVANTAGE_API_KEY from "../config/config.js";
 import auth0Client from "./authZero";
 import { Link, Redirect } from "react-router-dom";
+import { create } from "domain";
 
 const coinNames = ["BTC", "LTC", "ETH", "XRP", "EOS"];
 
@@ -14,7 +15,6 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      userID: 1, //hardcoded
       coinData: [],
       coinFullNames: [],
       wallet: {}
@@ -183,31 +183,41 @@ class App extends React.Component {
     return coinsData;
   }
 
-  createUser() {
-    //post(users/create)
+  //This method is called inside retrieve wallet if no wallets are found. 
+  createUser() { //mjw- untested
+    axios.post("/users/create", {
+      username: localStorage.name
+    })
+    .then(function(response){
+      console.log("new user created");
+      //you can set state stuff here
+      //or alternatively you can invoke retrieveWallet
+    });
   }
-  verifyUser() {
-    //get(/users)
-  }
-  logout() {
-    //patch or post(/users/logout)
-  }
-  retrieveWallet(user) {
+ 
+  retrieveWallet() { //mjw- untested
     //get (path = '/api/wallet/' +userID)
     axios
-      .get("localhost:3000/api/wallets/" + this.state.userID)
+      .get("/api/wallets/" + localStorage.name)
       .then(function(response) {
-        console.log("You got the data, but are not using the response.");
-        //console.log(response);
+        console.log('GET wallet successful:');
+        if (response.body === ''){
+          console.log('No existing wallets. Creating new Wallet');
+          this.createUser();
+        } else{
+          console.log('Here is you wallet');
+          //set state stuff here
+        }
+        
       })
       .catch(function(error) {
         console.log(error);
       });
   }
 
-  setCoins(c1, c2, c3, c4, c5) {
+  setCoins(c1, c2, c3, c4, c5) { //mjw- untested
     axios
-      .patch("localhost:3000/api/wallets/" + this.state.userID, {
+      .patch("/api/wallets/" + localStorage.name, {
         c1: c1,
         c2: c2,
         c3: c3,
