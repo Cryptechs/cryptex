@@ -32,7 +32,7 @@ const Graph = props => {
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
+          <XAxis dataKey="timeStamp" />
           <YAxis />
           <Tooltip />
           <Area

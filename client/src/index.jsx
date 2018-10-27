@@ -123,6 +123,7 @@ class App extends React.Component {
       let coin5TotalUSD = coin5Value * coin5Amount;
 
       walletHistory.push({
+        timeStamp: "Day -" + i,
         coin1Name: coinNames[0],
         coin2Name: coinNames[1],
         coin3Name: coinNames[2],
