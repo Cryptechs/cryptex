@@ -13,7 +13,8 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      coinsData: [],
+      userID: 1, //hardcoded
+      coinData: [],
       coinFullNames: [],
       wallet: {}
     };
@@ -187,13 +188,35 @@ class App extends React.Component {
   }
   retrieveWallet(user) {
     //get (path = '/api/wallet/' +userID)
+    axios
+      .get('localhost:3000/api/wallets/' + this.state.userID)
+      .then(function (response) {
+        console.log('You got the data, but are not using the response.')
+        //console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+
   }
-  getCoinHistory(coin) {
-    //mjw- is this still used?
-  }
-  setCoins() {
-    //patch(/wallet/get)
-    //axios
+
+  setCoins(c1, c2, c3, c4 ,c5) {
+    axios
+      .patch('localhost:3000/api/wallets/' + this.state.userID,
+      {
+        c1: c1,
+        c2: c2,
+        c3: c3,
+        c4: c4,
+        c5: c5
+      })
+      .then(function (response) {
+        console.log('Did we patch it?')
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   }
 
   render() {
