@@ -145,13 +145,13 @@ class App extends React.Component {
         coin5TotalUSD: coin5TotalUSD
       });
     }
-    // Mock wallet data (This is the current state of the wallet, which is array elem 0 of the history of the wallet)
+    // Mock wallet data (This is the current state of the wallet, which is array elem 50 of the history of the wallet)
     let wallet = {};
     wallet.coins = [];
     for (let i = 0; i < 5; i++) {
       wallet.coins.push({
-        amount: eval(`walletHistory[0].coin${i + 1}Amount`),
-        value: eval(`walletHistory[0].coin${i + 1}Value`),
+        amount: eval(`walletHistory[50].coin${i + 1}Amount`),
+        value: eval(`walletHistory[50].coin${i + 1}Value`),
         name: coinNames[i]
       });
     }
@@ -205,7 +205,10 @@ class App extends React.Component {
           wallet={this.state.wallet}
           coinFullNames={this.state.coinFullNames}
         />
-        <Wallet wallet={this.state.wallet} />
+        <Wallet
+          wallet={this.state.wallet}
+          coinFullNames={this.state.coinFullNames}
+        />
         <Add />
         <div>
           <footer>Micah Weiss, James Dempsey, Chris Athanas</footer>

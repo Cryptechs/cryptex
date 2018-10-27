@@ -1,11 +1,11 @@
 import React from "react";
 
 const Wallet = props => {
-  let { wallet } = props;
+  let { wallet, coinFullNames } = props;
 
   if (wallet === undefined || wallet.coins === undefined)
     return <div>Loading data...</div>;
-  else
+  else {
     return (
       <div className="wallet">
         Total Wallet Value = $
@@ -16,14 +16,15 @@ const Wallet = props => {
         {wallet.coins.map((i, idx) => {
           return (
             <div key={idx}>
-              Coin Name:
-              {i.name} :{i.amount.toPrecision(4)} * ${i.value.toPrecision(4)} =
-              ${(i.amount * i.value).toPrecision(5)}
+              Coin Name: {coinFullNames[idx]} [{i.name}] :
+              {i.amount.toPrecision(4)} * ${i.value.toPrecision(4)} = $
+              {(i.amount * i.value).toPrecision(5)}
             </div>
           );
         })}
       </div>
     );
+  }
 };
 
 export default Wallet;
