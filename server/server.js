@@ -41,13 +41,23 @@ const checkJwt = jwt({
 
 
 //createUser
-app.post('/users/create')
-
-//verifyUser -should this be a post?
-app.get('/users')
-
-//logout
-app.post('/users/logout');
+app.post('/users/create', (req,res)=>{
+    knex('users').insert({username: req.body.username})
+        .then( ()=>{
+            console.log('added username', req.body.username)
+            knex.raw('SELECT time_value FROM coin_values ORDER BY time_value DESC LIMIT 1;')
+                .then((results)=>{
+                    knex('wallets').insert({
+                        timestamp: results.rows[0].time_value,
+                        user_id: req.body.username
+                    }) //currencies all default to zero
+                        .then(()=>{
+                            console.log('wallet created');
+                            res.send('created user', req.body.username, 'with a zero wallet at', results.rows[0].time_value );
+                        });
+                });
+        })
+});
 
 //retrieveWallet
 app.get('/api/wallet/:id', (req, res) => {
