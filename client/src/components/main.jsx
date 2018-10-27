@@ -31,10 +31,10 @@ class Main extends React.Component {
           <button onClick={() => this.changeView("coin5")}>Coin 5</button>
         </div>
         {this.state.view === "wallet" ? (
-          <Graph data={this.props.coinData} />
+          <Graph data={this.props.wallet.walletHistory} />
         ) : (
           <GraphCoin
-            data={this.props.coinData}
+            data={this.props.coinsData}
             coinName={this.state.view}
             coinFullNames={this.props.coinFullNames}
           />

@@ -8,7 +8,7 @@ const Wallet = props => {
   else
     return (
       <div className="wallet">
-        Total Value = $
+        Total Wallet Value = $
         {wallet.coins
           .reduce((total, i) => (total = total + i.amount * i.value), 0)
           .toPrecision(5)}
