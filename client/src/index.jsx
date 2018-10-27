@@ -37,10 +37,10 @@ class App extends React.Component {
     });
 
     // Get Live data
-    //this.getLiveCoinDataAndCoinsFullNamesFromAPI(coinNames, coinData);
+    this.getLiveCoinDataAndCoinsFullNamesFromAPI(coinNames, coinsData);
   }
 
-  getLiveCoinDataAndCoinsFullNamesFromAPI(mockCoinNames, coinData) {
+  getLiveCoinDataAndCoinsFullNamesFromAPI(mockCoinNames, coinsData) {
     let coinFullNames = mockCoinNames.slice();
     for (let coinIdx = 0; coinIdx < mockCoinNames.length; coinIdx++) {
       let self = this;
@@ -71,14 +71,14 @@ class App extends React.Component {
                 )[i]
               ]["4a. close (USD)"];
             // Use the index of the coin from the response
-            eval(`coinData[${i}].coin${coinIndex + 1} = ${data};`);
+            eval(`coinsData[${i}].coin${coinIndex + 1} = ${data};`);
           }
           // get full name of this coin
           coinFullNames[coinIndex] =
             response.data["Meta Data"]["3. Digital Currency Name"];
 
           self.setState({
-            coinData: coinData,
+            coinsData: coinsData,
             coinFullNames: coinFullNames.slice()
           });
         })
