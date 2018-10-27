@@ -29,6 +29,7 @@ class App extends React.Component {
     if (!auth0Client.isAuthenticated()) {
       console.log("im here");
     }
+    //call get(localstorage.name)
 
     // create Mock coin data
     var {
@@ -229,8 +230,7 @@ class App extends React.Component {
         <Link to="/" onClick={auth0Client.signOut}>
           Logout
         </Link>
-        <button onClick={auth0Client.handleAuthentication}>Click me</button>
-        <h3>Welcome to Cryptex!</h3>
+        <h3>Welcome to your Cryptex Profile!</h3>
         <Main
           coinsData={this.state.coinsData}
           wallet={this.state.wallet}

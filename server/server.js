@@ -64,6 +64,7 @@ app.get('/api/wallet/:id', (req, res) => {
         })
         // Note: if id not found, does not error. Returns all zero matches. 
         .catch((err) => {
+            //knex.create
             console.log('Error getting wallet', err);
             res.status(404);
             res.send('Error getting wallet: ', err)
