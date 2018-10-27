@@ -37,35 +37,35 @@ const Graph = props => {
           <Tooltip />
           <Area
             type="monotone"
-            dataKey="coin1Value"
+            dataKey="coin1TotalUSD"
             stackId="1"
             stroke="#8884d8"
             fill="#8884d8"
           />
           <Area
             type="monotone"
-            dataKey="coin2Value"
+            dataKey="coin2TotalUSD"
             stackId="1"
             stroke="#82ca9d"
             fill="#82ca9d"
           />
           <Area
             type="monotone"
-            dataKey="coin3Value"
+            dataKey="coin3TotalUSD"
             stackId="1"
             stroke="#ffc658"
             fill="#ffc658"
           />
           <Area
             type="monotone"
-            dataKey="coin4Value"
+            dataKey="coin4TotalUSD"
             stackId="1"
             stroke="#00c6FF"
             fill="#00c6FF"
           />
           <Area
             type="monotone"
-            dataKey="coin5Value"
+            dataKey="coin5TotalUSD"
             stackId="1"
             stroke="#66c600"
             fill="#66c600"

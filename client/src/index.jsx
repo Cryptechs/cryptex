@@ -54,12 +54,12 @@ class App extends React.Component {
         .then(function(response) {
           // get the crypto ticker name from the response object
           //  && then look it up in our index of coinNames
-          let coinIndex = mockCoinNames.indexOf(
+          let coinIndex = coinNames.indexOf(
             response.data["Meta Data"]["2. Digital Currency Code"]
           );
           if (coinIndex === -1) {
             console.log(
-              "Bad Coinindex for ",
+              "Bad Coin Index for ",
               response.data["Meta Data"]["2. Digital Currency Code"]
             );
           }
@@ -77,8 +77,11 @@ class App extends React.Component {
           coinFullNames[coinIndex] =
             response.data["Meta Data"]["3. Digital Currency Name"];
 
+          let wallet = self.createWalletFromCoinsData(coinsData, coinNames); // fix - do this here?
+
           self.setState({
             coinsData: coinsData,
+            wallet: wallet,
             coinFullNames: coinFullNames.slice()
           });
         })
@@ -90,18 +93,32 @@ class App extends React.Component {
 
   createMockWalletAndCoinsDataAndCoinNames() {
     // create random data for each coin and create a wallet history
-    const coinsData = [];
+    const coinsData = this.createMockCoinsData();
+    let wallet = this.createWalletFromCoinsData(coinsData, coinNames);
+
+    return { wallet, coinsData, coinNames };
+  }
+
+  createWalletFromCoinsData(coinsData, coinNames) {
     const walletHistory = [];
     for (let i = 50; i >= 0; i--) {
-      let item = {
-        timestamp: "Day -" + i,
-        coin1: Math.random() * 2000,
-        coin2: Math.random() * 2000,
-        coin3: Math.random() * 2000,
-        coin4: Math.random() * 2000,
-        coin5: Math.random() * 2000
-      };
-      coinsData.push(item);
+      let coin1Value = coinsData[i].coin1;
+      let coin2Value = coinsData[i].coin2;
+      let coin3Value = coinsData[i].coin3;
+      let coin4Value = coinsData[i].coin4;
+      let coin5Value = coinsData[i].coin5;
+
+      let coin1Amount = 0.01 * Math.random() * (40 - i);
+      let coin2Amount = 3 * Math.random() * (40 - i);
+      let coin3Amount = 4 * Math.random() * (40 - i);
+      let coin4Amount = 2 * Math.random() * (40 - i);
+      let coin5Amount = 7 * Math.random() * (40 - i);
+
+      let coin1TotalUSD = coin1Value * coin1Amount;
+      let coin2TotalUSD = coin2Value * coin2Amount;
+      let coin3TotalUSD = coin3Value * coin3Amount;
+      let coin4TotalUSD = coin4Value * coin4Amount;
+      let coin5TotalUSD = coin5Value * coin5Amount;
 
       walletHistory.push({
         coin1Name: coinNames[0],
@@ -109,22 +126,24 @@ class App extends React.Component {
         coin3Name: coinNames[2],
         coin4Name: coinNames[3],
         coin5Name: coinNames[4],
-        coin1Value: item.coin1,
-        coin1Amount: Math.random() * 50,
-        coin2Value: item.coin2,
-        coin2Amount: Math.random() * 50,
-        coin3Value: item.coin3,
-        coin3Amount: Math.random() * 50,
-        coin4Value: item.coin4,
-        coin4Amount: Math.random() * 50,
-        coin5Value: item.coin5,
-        coin5Amount: Math.random() * 50,
-        totalValue:
-          item.coin1 + item.coin2 + item.coin3 + item.coin4 + item.coin5
+        coin1Value: coin1Value,
+        coin2Value: coin2Value,
+        coin3Value: coin3Value,
+        coin4Value: coin4Value,
+        coin5Value: coin5Value,
+        coin1Amount: coin1Amount,
+        coin2Amount: coin2Amount,
+        coin3Amount: coin3Amount,
+        coin4Amount: coin4Amount,
+        coin5Amount: coin5Amount,
+        coin1TotalUSD: coin1TotalUSD,
+        coin2TotalUSD: coin2TotalUSD,
+        coin3TotalUSD: coin3TotalUSD,
+        coin4TotalUSD: coin4TotalUSD,
+        coin5TotalUSD: coin5TotalUSD
       });
     }
-
-    // Mock wallet data (This is the current total only)
+    // Mock wallet data (This is the current state of the wallet, which is array elem 0 of the history of the wallet)
     let wallet = {};
     wallet.coins = [];
     for (let i = 0; i < 5; i++) {
@@ -135,7 +154,23 @@ class App extends React.Component {
       });
     }
     wallet.walletHistory = walletHistory;
-    return { wallet, coinsData, coinNames };
+    return wallet;
+  }
+
+  createMockCoinsData() {
+    const coinsData = [];
+    for (let i = 50; i >= 0; i--) {
+      let item = {
+        timestamp: "Day -" + i,
+        coin1: Math.random() * 2000,
+        coin2: Math.random() * 2000,
+        coin3: Math.random() * 2000,
+        coin4: Math.random() * 2000,
+        coin5: Math.random() * 2000
+      };
+      coinsData.push(item);
+    }
+    return coinsData;
   }
 
   createUser() {
