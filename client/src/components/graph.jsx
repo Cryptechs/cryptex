@@ -38,6 +38,7 @@ const Graph = props => {
           <Area
             type="monotone"
             dataKey="coin1TotalUSD"
+            name={props.coinFullNames[0] + "(USD)"}
             stackId="1"
             stroke="#8884d8"
             fill="#8884d8"
@@ -45,6 +46,7 @@ const Graph = props => {
           <Area
             type="monotone"
             dataKey="coin2TotalUSD"
+            name={props.coinFullNames[1] + "(USD)"}
             stackId="1"
             stroke="#82ca9d"
             fill="#82ca9d"
@@ -52,6 +54,7 @@ const Graph = props => {
           <Area
             type="monotone"
             dataKey="coin3TotalUSD"
+            name={props.coinFullNames[2] + "(USD)"}
             stackId="1"
             stroke="#ffc658"
             fill="#ffc658"
@@ -59,6 +62,7 @@ const Graph = props => {
           <Area
             type="monotone"
             dataKey="coin4TotalUSD"
+            name={props.coinFullNames[3] + "(USD)"}
             stackId="1"
             stroke="#00c6FF"
             fill="#00c6FF"
@@ -66,6 +70,7 @@ const Graph = props => {
           <Area
             type="monotone"
             dataKey="coin5TotalUSD"
+            name={props.coinFullNames[4] + "(USD)"}
             stackId="1"
             stroke="#66c600"
             fill="#66c600"

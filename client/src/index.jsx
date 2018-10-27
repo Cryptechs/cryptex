@@ -52,6 +52,8 @@ class App extends React.Component {
             ALPHA_ADVANTAGE_API_KEY
         )
         .then(function(response) {
+          //FIX - check for errors from AlphaAdvantage
+
           // get the crypto ticker name from the response object
           //  && then look it up in our index of coinNames
           let coinIndex = coinNames.indexOf(
@@ -86,7 +88,7 @@ class App extends React.Component {
           });
         })
         .catch(function(error) {
-          console.log(error);
+          console.log("*** Error Getting data from AlphaAdvantage:", error);
         });
     }
   }
