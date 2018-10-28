@@ -40,7 +40,6 @@ class App extends React.Component {
     //   coinNames
     // } = this.createMockWalletAndCoinsDataAndCoinNames();
 
-    debugger;
     this.retrieveWallet(wallet => {
       this.getLiveCoinDataAndCoinFullNamesFromAPI(coinNames);
 
@@ -57,13 +56,25 @@ class App extends React.Component {
 
     // set the current number of coins to the new amount of coins
     let wallet = this.state.wallet;
-    eval(`wallet.coins[${coinNameIdx}].amount = ${amount}`);
 
     //Update the last entry for the walletHistory to reflect new amount of coins
     let updateTimeStampIdx = wallet.walletHistory.length - 1;
+    debugger;
+
+    eval(`wallet.coins[${coinNameIdx}].amount = ${amount}`);
+    eval(
+      `wallet.coins[${coinNameIdx}].value = this.state.coinsData[50].coin${coinNameIdx +
+        1}`
+    );
+
+    // Update the wallet coin's value, amount and totalUSD
     eval(
       `wallet.walletHistory[updateTimeStampIdx].coin${coinNameIdx +
         1}Amount = ${amount}`
+    );
+    eval(
+      `wallet.walletHistory[updateTimeStampIdx].coin${coinNameIdx +
+        1}Value = this.state.coinsData[50].coin${coinNameIdx + 1}`
     );
     eval(
       `wallet.walletHistory[updateTimeStampIdx].coin${coinNameIdx +
@@ -120,7 +131,7 @@ class App extends React.Component {
           coinFullNames[coinIndex] =
             response.data["Meta Data"]["3. Digital Currency Name"];
 
-          //let wallet = self.createWalletFromCoinsData(coinsData, coinNames); // only for mock data this here?
+          //let wallet = self.createWalletFromCoinsData(coinsData, coinNames); // only for mock data
 
           self.setState({
             coinsData: coinsData,
