@@ -49,11 +49,12 @@ app.post("/users/create", (req, res) => {
                     "SELECT time_value FROM coin_values ORDER BY time_value DESC LIMIT 1;"
                 )
                 .then(results => {
+                    console.log(results)
                     knex("wallets")
                         .insert({
                             timestamp: results.rows[0].time_value,
                             user_id: req.body.username
-                        }) //currencies all default to zero
+                        }) //currencies all default to zeros
                         .then(() => {
                             console.log("wallet created");
                             res.send(
@@ -69,6 +70,7 @@ app.post("/users/create", (req, res) => {
 
 //retrieveWallet
 app.get("/api/wallet/:id", (req, res) => {
+    console.log(req)
     console.log("wallet get req");
     console.log("params", req.params);
 
@@ -130,8 +132,8 @@ app.patch("/api/wallet/:id", (req, res) => {
         })
         .catch(err => {
             console.log("Error updating wallet", err);
-            res.status(404);
-            res.send("Error updating wallet: ", err);
+            res.status(404)
+            res.send(err);
         });
 });
 
