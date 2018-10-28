@@ -7,7 +7,7 @@ const knex = require('../database/knex')
 const jwt = require('express-jwt');
 const jwtAuthz = require('express-jwt-authz');
 const jwksRsa = require('jwks-rsa');
-const ALPHA_ADVANTAGE_API_KEY = require('../client/config/config.js');
+const ALPHA_ADVANTAGE_API_KEY = require('../database/config/dbconfig.js');
 
 app.use(express.static(__dirname + '/../client/dist'));
 app.use(bodyParser.json())
@@ -150,13 +150,14 @@ const getLiveCoinData = () => { //
                 c3_value: output.EOS_value,
             })
             .then(()=> {
-                //update all users wallets with a timestamp at their current amounts (super hacky)
+                //add a row users wallets with the timestamp and their current amounts (super hacky)
                 knex('wallets').distinct().select('user_id') //gets list of distinct usernames
                 .then((resNames)=> {
                     console.log('resNames', resNames);
                     //resNames is an array of objects containing just names e.g. [{ user_id: 'name@email.com' }]
                     for(let i=0; i < resNames.length; i++){
-                        knex('wallets').select().orderBy('timestamp', 'desc').limit(1)//.where('user_id' === resNames[i].user_id)
+                        let subquery = knex('wallets')
+                        knex('wallets').where('user_id', resNames[i].user_id).select().orderBy('timestamp', 'desc').limit(1)
                         .then((recentRow)=>{ //now that we have the most recent row for a username
                             console.log('recentRow', recentRow);
                             knex('wallets').insert({
@@ -169,6 +170,7 @@ const getLiveCoinData = () => { //
                                 c3_amount: recentRow[0].c5_amount,
                             })
                             .then(()=>{console.log('Updated user', resNames[i].user_id)})
+                            .catch(()=>{console.log('Error: could not update user data')});
 
                         })
                     }
