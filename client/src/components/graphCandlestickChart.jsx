@@ -187,7 +187,7 @@ class CandleStickChartWithFibonacciInteractiveIndicator extends React.Component 
     return (
       <ChartCanvas
         ref={this.saveCanvasNode}
-        height={600}
+        height={500}
         width={width}
         ratio={ratio}
         margin={{ left: 70, right: 70, top: 20, bottom: 30 }}

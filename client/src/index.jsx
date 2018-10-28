@@ -47,9 +47,9 @@ class App extends React.Component {
     this.retrieveWallet(wallet => {
       this.getLiveCoinDataAndCoinFullNamesFromAPI(coinNames);
 
-      // candlestick
-      getData().then(data => {
-        this.setState({ candleData: data });
+      getData().then(candleData => {
+        console.log("candleData=", candleData);
+        this.setState({ candleData: candleData });
       });
 
       this.setState({
@@ -117,6 +117,8 @@ class App extends React.Component {
               response.data["Meta Data"]["2. Digital Currency Code"]
             );
           }
+
+          // Get the basic coins data
           for (let i = 50; i >= 0; i--) {
             let data =
               response.data["Time Series (Digital Currency Daily)"][
@@ -133,6 +135,32 @@ class App extends React.Component {
             response.data["Meta Data"]["3. Digital Currency Name"];
 
           //let wallet = self.createWalletFromCoinsData(coinsData, coinNames); // only for mock data
+
+          // candlestick TODO
+          // Get the full coin candlestick data
+          // candleFormatData = [];
+          // candleData = getData(candleFormatData);
+          // this.setState({ candleData: candleData });
+          if (candleStickCoins === undefined) candleStickCoins = [];
+          let timeSeriesKeys = Object.keys(
+            response.data["Time Series (Digital Currency Daily)"]
+          );
+          for (let i = 0; i < timeSeriesKeys.length; i++) {
+            let row =
+              response.data["Time Series (Digital Currency Daily)"][
+                timeSeriesKeys[i]
+              ];
+
+            let formattedRow = {
+              date: timeParse("%Y-%m-%d"), // format date here
+              open: row["1a. open (USD)"],
+              high: row["2a. high (USD)"],
+              low: row["3a. low (USD)"],
+              close: row["4a. close (USD)"],
+              volume: row["5. volume"]
+            };
+            candleStickCoins[coinIndex][i] = formattedRow;
+          }
 
           self.setState({
             coinsData: coinsData,

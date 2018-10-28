@@ -16,6 +16,10 @@ function parseData(parse) {
 
 const parseDate = timeParse("%Y-%m-%d");
 
+// export function getCandleData(coinsData) {
+//   return tsvParse(coinsCandleData, parseData(parseDate));
+// }
+
 export function getData() {
   const promiseMSFT = fetch(
     "https://cdn.rawgit.com/rrag/react-stockcharts/master/docs/data/MSFT.tsv"
