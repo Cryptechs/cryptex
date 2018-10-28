@@ -41,6 +41,7 @@ class App extends React.Component {
     //   coinNames
     // } = this.createMockWalletAndCoinsDataAndCoinNames();
 
+    debugger;
     this.retrieveWallet(wallet => {
       this.getLiveCoinDataAndCoinFullNamesFromAPI(coinNames);
 
@@ -113,6 +114,7 @@ class App extends React.Component {
                 )[i]
               ]["4a. close (USD)"];
             // Use the index of the coin from the response
+            if (coinsData[i] === undefined) coinsData[i] = {};
             eval(`coinsData[${i}].coin${coinIndex + 1} = ${data};`);
           }
           // get full name of this coin
@@ -216,7 +218,7 @@ class App extends React.Component {
         name: coinNames[i]
       });
     }
-    wallet.timeStamp = wallet.walletHistory.timeStamp[serverWalletLength - 1];
+    wallet.timeStamp = wallet.walletHistory[serverWalletLength - 1].timeStamp;
 
     return wallet;
   }
