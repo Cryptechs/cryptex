@@ -10,6 +10,10 @@ import { Link, Redirect } from "react-router-dom";
 import { create } from "domain";
 import { runInThisContext } from "vm";
 
+// candlestick charting /
+import { render } from "react-dom";
+import { getData } from "./components/utils";
+
 const coinNames = ["BTC", "LTC", "ETH", "XRP", "EOS"];
 
 class App extends React.Component {
@@ -43,7 +47,11 @@ class App extends React.Component {
     this.retrieveWallet(wallet => {
       this.getLiveCoinDataAndCoinFullNamesFromAPI(coinNames);
 
-      //look for wallet
+      // candlestick
+      getData().then(data => {
+        this.setState({ candleData: data });
+      });
+
       this.setState({
         wallet: wallet
       });
@@ -261,6 +269,7 @@ class App extends React.Component {
           coinsData={this.state.coinsData}
           wallet={this.state.wallet}
           coinFullNames={this.state.coinFullNames}
+          candleData={this.state.candleData}
         />
         <Wallet
           wallet={this.state.wallet}

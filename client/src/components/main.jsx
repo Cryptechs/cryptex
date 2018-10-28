@@ -2,6 +2,10 @@ import React from "react";
 import Graph from "./graph.jsx";
 import GraphCoin from "./graphCoin.jsx";
 
+// candlestick
+import { render } from "react-dom";
+import Chart from "./graphCandlestickChart.jsx";
+
 class Main extends React.Component {
   constructor(props) {
     super(props);
@@ -35,12 +39,20 @@ class Main extends React.Component {
             data={this.props.wallet.walletHistory}
             coinFullNames={this.props.coinFullNames}
           />
-        ) : (
+        ) : // ( <GraphCoin
+        //   data={this.props.coinsData}
+        //   coinName={this.state.view}
+        //   coinFullNames={this.props.coinFullNames}
+        // /> )
+
+        this.state.view !== "coin1" ? (
           <GraphCoin
             data={this.props.coinsData}
             coinName={this.state.view}
             coinFullNames={this.props.coinFullNames}
           />
+        ) : (
+          <Chart type={"svg"} data={this.props.candleData} />
         )}
       </div>
     );
