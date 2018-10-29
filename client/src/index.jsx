@@ -10,6 +10,10 @@ import { Link, Redirect } from "react-router-dom";
 import { create } from "domain";
 import { runInThisContext } from "vm";
 
+// candlestick charting /
+import { render } from "react-dom";
+import { getData } from "./components/utils";
+
 const coinNames = ["BTC", "LTC", "ETH", "XRP", "EOS"];
 
 class App extends React.Component {
@@ -18,7 +22,8 @@ class App extends React.Component {
     this.state = {
       coinData: [],
       coinFullNames: [],
-      wallet: {}
+      wallet: {},
+      coinCandlestickData: []
     };
 
     this.handleUpdateCoinAmounts = this.handleUpdateCoinAmounts.bind(this);
@@ -44,7 +49,11 @@ class App extends React.Component {
     this.retrieveWallet(wallet => {
       this.getLiveCoinDataAndCoinFullNamesFromAPI(coinNames);
 
-      //look for wallet
+      // getData().then(candleData => {
+      //   console.log("candleData=", candleData);
+      //   this.setState({ candleData: candleData });
+      // });
+
       this.setState({
         wallet: wallet
       });
@@ -57,21 +66,26 @@ class App extends React.Component {
 
     // set the current number of coins to the new amount of coins
     let wallet = this.state.wallet;
-    eval(`wallet.coins[${coinNameIdx}].amount = ${amount}`);
 
     //Update the last entry for the walletHistory to reflect new amount of coins
     let updateTimeStampIdx = wallet.walletHistory.length - 1;
+
+    // Update the wallet with new number of coins
+    eval(`wallet.coins[${coinNameIdx}].amount = ${amount}`);
+
+    // Update the walletHistory coin amount and totalUSD
     eval(
-      `wallet.walletHistory[updateTimeStampIdx].coin${coinNameIdx +
+      `wallet.walletHistory[${updateTimeStampIdx}].coin${coinNameIdx +
         1}Amount = ${amount}`
     );
     eval(
-      `wallet.walletHistory[updateTimeStampIdx].coin${coinNameIdx +
-        1}TotalUSD = ${amount} * this.state.wallet.walletHistory[updateTimeStampIdx].coin${coinNameIdx +
-        1}Value`
+      `wallet.walletHistory[${updateTimeStampIdx}].coin${coinNameIdx +
+        1}TotalUSD = ${amount} * wallet.coins[${coinNameIdx}].value`
     );
 
+    // These next 2 lines cause React to update the UI
     this.state.wallet.walletHistory = this.state.wallet.walletHistory.slice();
+    this.state.wallet.coins = this.state.wallet.coins.slice();
     this.setState({ wallet: wallet });
 
     // send this new wallet to the server
@@ -81,6 +95,7 @@ class App extends React.Component {
   getLiveCoinDataAndCoinFullNamesFromAPI(coinNames) {
     let coinFullNames = coinNames.slice();
     let coinsData = [];
+    const candlestickCoinsData = [];
     for (let coinIdx = 0; coinIdx < coinNames.length; coinIdx++) {
       let self = this;
       axios
@@ -105,6 +120,8 @@ class App extends React.Component {
               response.data["Meta Data"]["2. Digital Currency Code"]
             );
           }
+
+          // Get the basic coins data
           for (let i = 50; i >= 0; i--) {
             let data =
               response.data["Time Series (Digital Currency Daily)"][
@@ -120,9 +137,40 @@ class App extends React.Component {
           coinFullNames[coinIndex] =
             response.data["Meta Data"]["3. Digital Currency Name"];
 
-          //let wallet = self.createWalletFromCoinsData(coinsData, coinNames); // only for mock data this here?
+          //let wallet = self.createWalletFromCoinsData(coinsData, coinNames); // only for mock data
+
+          // Candlestick data format
+          let timeSeriesKeys = Object.keys(
+            response.data["Time Series (Digital Currency Daily)"]
+          );
+          candlestickCoinsData[coinIndex] = [];
+          for (let i = timeSeriesKeys.length - 1; i >= 0; i--) {
+            let row =
+              response.data["Time Series (Digital Currency Daily)"][
+                timeSeriesKeys[i]
+              ];
+
+            let timeSeriesDate = timeSeriesKeys[i].split("-"); //2018-10-27
+            let formattedRow = {
+              date: new Date(
+                timeSeriesDate[0],
+                timeSeriesDate[1] - 1, // in js Date, months are zero based
+                timeSeriesDate[2]
+              ), // Month, Day, Year
+              open: +row["1a. open (USD)"],
+              high: +row["2a. high (USD)"],
+              low: +row["3a. low (USD)"],
+              close: +row["4a. close (USD)"],
+              volume: +row["5. volume"],
+              marketCap: +row["6. market cap (USD)"],
+              coinName: coinNames[coinIndex],
+              coinFullName: coinFullNames[coinIndex]
+            };
+            candlestickCoinsData[coinIndex].push(formattedRow);
+          }
 
           self.setState({
+            candlestickCoinsData: candlestickCoinsData,
             coinsData: coinsData,
             // wallet: wallet, // mock only
             coinFullNames: coinFullNames.slice()
@@ -216,6 +264,7 @@ class App extends React.Component {
         value: eval(`walletHistory[serverWalletLength-1].coin${i + 1}Value`),
         name: coinNames[i]
       });
+      this.state.coinFullNames[i] = coinNames[i];
     }
     wallet.timeStamp = wallet.walletHistory[serverWalletLength - 1].timeStamp;
 
@@ -227,6 +276,7 @@ class App extends React.Component {
     let self = this;
     axios
       .patch("/api/wallet/" + localStorage.name, {
+        // Fix also save values of coins here?
         c1: wallet.coins[0].amount,
         c2: wallet.coins[1].amount,
         c3: wallet.coins[2].amount,
@@ -255,6 +305,7 @@ class App extends React.Component {
           coinsData={this.state.coinsData}
           wallet={this.state.wallet}
           coinFullNames={this.state.coinFullNames}
+          candlestickCoinsData={this.state.candlestickCoinsData}
         />
         <Wallet
           wallet={this.state.wallet}
@@ -277,91 +328,91 @@ class App extends React.Component {
     );
   }
 
-  // For mock and testing
-  createMockWalletAndCoinsDataAndCoinNames() {
-    // create random data for each coin and create a wallet history
-    const coinsData = this.createMockCoinsData();
-    let wallet = this.createWalletFromCoinsData(coinsData, coinNames);
+  // // For mock and testing
+  // createMockWalletAndCoinsDataAndCoinNames() {
+  //   // create random data for each coin and create a wallet history
+  //   const coinsData = this.createMockCoinsData();
+  //   let wallet = this.createWalletFromCoinsData(coinsData, coinNames);
 
-    return { wallet, coinsData, coinNames };
-  }
+  //   return { wallet, coinsData, coinNames };
+  // }
 
-  // For mock and testing
-  createWalletFromCoinsData(coinsData, coinNames) {
-    const walletHistory = [];
-    for (let i = 50; i >= 0; i--) {
-      let coin1Value = coinsData[i].coin1;
-      let coin2Value = coinsData[i].coin2;
-      let coin3Value = coinsData[i].coin3;
-      let coin4Value = coinsData[i].coin4;
-      let coin5Value = coinsData[i].coin5;
+  // // For mock and testing
+  // createWalletFromCoinsData(coinsData, coinNames) {
+  //   const walletHistory = [];
+  //   for (let i = 50; i >= 0; i--) {
+  //     let coin1Value = coinsData[i].coin1;
+  //     let coin2Value = coinsData[i].coin2;
+  //     let coin3Value = coinsData[i].coin3;
+  //     let coin4Value = coinsData[i].coin4;
+  //     let coin5Value = coinsData[i].coin5;
 
-      let coin1Amount = 0.01 * Math.random() * (40 - i);
-      let coin2Amount = 3 * Math.random() * (40 - i);
-      let coin3Amount = 4 * Math.random() * (40 - i);
-      let coin4Amount = 2 * Math.random() * (40 - i);
-      let coin5Amount = 7 * Math.random() * (40 - i);
+  //     let coin1Amount = 0.01 * Math.random() * (40 - i);
+  //     let coin2Amount = 3 * Math.random() * (40 - i);
+  //     let coin3Amount = 4 * Math.random() * (40 - i);
+  //     let coin4Amount = 2 * Math.random() * (40 - i);
+  //     let coin5Amount = 7 * Math.random() * (40 - i);
 
-      let coin1TotalUSD = coin1Value * coin1Amount;
-      let coin2TotalUSD = coin2Value * coin2Amount;
-      let coin3TotalUSD = coin3Value * coin3Amount;
-      let coin4TotalUSD = coin4Value * coin4Amount;
-      let coin5TotalUSD = coin5Value * coin5Amount;
+  //     let coin1TotalUSD = coin1Value * coin1Amount;
+  //     let coin2TotalUSD = coin2Value * coin2Amount;
+  //     let coin3TotalUSD = coin3Value * coin3Amount;
+  //     let coin4TotalUSD = coin4Value * coin4Amount;
+  //     let coin5TotalUSD = coin5Value * coin5Amount;
 
-      walletHistory.push({
-        timeStamp: "Day -" + i,
-        coin1Name: coinNames[0],
-        coin2Name: coinNames[1],
-        coin3Name: coinNames[2],
-        coin4Name: coinNames[3],
-        coin5Name: coinNames[4],
-        coin1Value: coin1Value,
-        coin2Value: coin2Value,
-        coin3Value: coin3Value,
-        coin4Value: coin4Value,
-        coin5Value: coin5Value,
-        coin1Amount: coin1Amount,
-        coin2Amount: coin2Amount,
-        coin3Amount: coin3Amount,
-        coin4Amount: coin4Amount,
-        coin5Amount: coin5Amount,
-        coin1TotalUSD: coin1TotalUSD,
-        coin2TotalUSD: coin2TotalUSD,
-        coin3TotalUSD: coin3TotalUSD,
-        coin4TotalUSD: coin4TotalUSD,
-        coin5TotalUSD: coin5TotalUSD
-      });
-    }
-    // Mock wallet data (This is the current state of the wallet, which is array elem 50 of the history of the wallet)
-    let wallet = {};
-    wallet.coins = [];
-    for (let i = 0; i < 5; i++) {
-      wallet.coins.push({
-        amount: eval(`walletHistory[50].coin${i + 1}Amount`),
-        value: eval(`walletHistory[50].coin${i + 1}Value`),
-        name: coinNames[i]
-      });
-    }
-    wallet.walletHistory = walletHistory;
-    return wallet;
-  }
+  //     walletHistory.push({
+  //       timeStamp: "Day -" + i,
+  //       coin1Name: coinNames[0],
+  //       coin2Name: coinNames[1],
+  //       coin3Name: coinNames[2],
+  //       coin4Name: coinNames[3],
+  //       coin5Name: coinNames[4],
+  //       coin1Value: coin1Value,
+  //       coin2Value: coin2Value,
+  //       coin3Value: coin3Value,
+  //       coin4Value: coin4Value,
+  //       coin5Value: coin5Value,
+  //       coin1Amount: coin1Amount,
+  //       coin2Amount: coin2Amount,
+  //       coin3Amount: coin3Amount,
+  //       coin4Amount: coin4Amount,
+  //       coin5Amount: coin5Amount,
+  //       coin1TotalUSD: coin1TotalUSD,
+  //       coin2TotalUSD: coin2TotalUSD,
+  //       coin3TotalUSD: coin3TotalUSD,
+  //       coin4TotalUSD: coin4TotalUSD,
+  //       coin5TotalUSD: coin5TotalUSD
+  //     });
+  //   }
+  //   // Mock wallet data (This is the current state of the wallet, which is array elem 50 of the history of the wallet)
+  //   let wallet = {};
+  //   wallet.coins = [];
+  //   for (let i = 0; i < 5; i++) {
+  //     wallet.coins.push({
+  //       amount: eval(`walletHistory[50].coin${i + 1}Amount`),
+  //       value: eval(`walletHistory[50].coin${i + 1}Value`),
+  //       name: coinNames[i]
+  //     });
+  //   }
+  //   wallet.walletHistory = walletHistory;
+  //   return wallet;
+  // }
 
-  // for mock and testing
-  createMockCoinsData() {
-    const coinsData = [];
-    for (let i = 50; i >= 0; i--) {
-      let item = {
-        timestamp: "Day -" + i,
-        coin1: Math.random() * 2000,
-        coin2: Math.random() * 2000,
-        coin3: Math.random() * 2000,
-        coin4: Math.random() * 2000,
-        coin5: Math.random() * 2000
-      };
-      coinsData.push(item);
-    }
-    return coinsData;
-  }
+  // // for mock and testing
+  // createMockCoinsData() {
+  //   const coinsData = [];
+  //   for (let i = 50; i >= 0; i--) {
+  //     let item = {
+  //       timestamp: "Day -" + i,
+  //       coin1: Math.random() * 2000,
+  //       coin2: Math.random() * 2000,
+  //       coin3: Math.random() * 2000,
+  //       coin4: Math.random() * 2000,
+  //       coin5: Math.random() * 2000
+  //     };
+  //     coinsData.push(item);
+  //   }
+  //   return coinsData;
+  // }
 }
 
 export default App;

@@ -11,15 +11,16 @@ const Wallet = props => {
         Total Wallet Value = $
         {wallet.coins
           .reduce((total, i) => (total = total + i.amount * i.value), 0)
-          .toPrecision(3)}
+          .toFixed(2)}
         <br />
         {wallet.coins.map((i, idx) => {
           return (
             <div key={idx}>
               {coinFullNames[idx]}
               :&nbsp;
-              {i.amount.toPrecision(3)} * ${i.value.toPrecision(3)} = $
-              {(i.amount * i.value).toPrecision(3)}
+
+              {i.amount.toFixed(3)} * ${i.value.toFixed(2)} = $
+              {(i.amount * i.value).toFixed(2)}
             </div>
           );
         })}
