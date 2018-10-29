@@ -199,7 +199,6 @@ const getLiveCoinData = () => { //
                             console.log('resNames', resNames);
                             //resNames is an array of objects containing just names e.g. [{ user_id: 'name@email.com' }]
                             for (let i = 0; i < resNames.length; i++) {
-                                let subquery = knex('wallets')
                                 knex('wallets').where('user_id', resNames[i].user_id).select().orderBy('timestamp', 'desc').limit(1)
                                     .then((recentRow) => { //now that we have the most recent row for a username
                                         console.log('recentRow', recentRow);
