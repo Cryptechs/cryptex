@@ -32,22 +32,24 @@ class App extends React.Component {
     if (!auth0Client.isAuthenticated()) {
       console.log("im here");
     }
+    //call get(localstorage.name)
 
-    // create Mock coin data
-    var {
-      wallet,
-      coinsData,
-      coinNames
-    } = this.createMockWalletAndCoinsDataAndCoinNames();
+    // // create Mock coin data -- Leave here for testing
+    // var {
+    //   wallet,
+    //   coinsData,
+    //   coinNames
+    // } = this.createMockWalletAndCoinsDataAndCoinNames();
 
-    this.setState({
-      wallet: wallet,
-      coinsData: coinsData,
-      coinFullNames: coinNames
+    debugger;
+    this.retrieveWallet(wallet => {
+      this.getLiveCoinDataAndCoinFullNamesFromAPI(coinNames);
+
+      //look for wallet
+      this.setState({
+        wallet: wallet
+      });
     });
-
-    // Get Live data
-    this.getLiveCoinDataAndCoinsFullNamesFromAPI(coinNames, coinsData);
   }
 
   handleUpdateCoinAmounts(coinUIName, amount) {
@@ -56,33 +58,36 @@ class App extends React.Component {
 
     // set the current number of coins to the new amount of coins
     let wallet = this.state.wallet;
-    eval(`this.state.wallet.coins[${coinNameIdx}].amount = ${amount}`);
+    eval(`wallet.coins[${coinNameIdx}].amount = ${amount}`);
 
     //Update the last entry for the walletHistory to reflect new amount of coins
+    let updateTimeStampIdx = wallet.walletHistory.length - 1;
     eval(
-      `this.state.wallet.walletHistory[50].coin${coinNameIdx +
+      `wallet.walletHistory[updateTimeStampIdx].coin${coinNameIdx +
         1}Amount = ${amount}`
     );
     eval(
-      `this.state.wallet.walletHistory[50].coin${coinNameIdx +
-        1}TotalUSD = ${amount} * this.state.wallet.walletHistory[50].coin${coinNameIdx +
+      `wallet.walletHistory[updateTimeStampIdx].coin${coinNameIdx +
+        1}TotalUSD = ${amount} * this.state.wallet.walletHistory[updateTimeStampIdx].coin${coinNameIdx +
         1}Value`
     );
 
     this.state.wallet.walletHistory = this.state.wallet.walletHistory.slice();
-
     this.setState({ wallet: wallet });
-    // TODO send this new wallet to the server
+
+    // send this new wallet to the server
+    this.saveWallet(wallet);
   }
 
-  getLiveCoinDataAndCoinsFullNamesFromAPI(mockCoinNames, coinsData) {
-    let coinFullNames = mockCoinNames.slice();
-    for (let coinIdx = 0; coinIdx < mockCoinNames.length; coinIdx++) {
+  getLiveCoinDataAndCoinFullNamesFromAPI(coinNames) {
+    let coinFullNames = coinNames.slice();
+    let coinsData = [];
+    for (let coinIdx = 0; coinIdx < coinNames.length; coinIdx++) {
       let self = this;
       axios
         .get(
           "https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol=" +
-            mockCoinNames[coinIdx] +
+            coinNames[coinIdx] +
             "&market=USD&apikey=" +
             ALPHA_ADVANTAGE_API_KEY
         )
@@ -109,17 +114,18 @@ class App extends React.Component {
                 )[i]
               ]["4a. close (USD)"];
             // Use the index of the coin from the response
+            if (coinsData[i] === undefined) coinsData[i] = {};
             eval(`coinsData[${i}].coin${coinIndex + 1} = ${data};`);
           }
           // get full name of this coin
           coinFullNames[coinIndex] =
             response.data["Meta Data"]["3. Digital Currency Name"];
 
-          let wallet = self.createWalletFromCoinsData(coinsData, coinNames); // fix - do this here?
+          //let wallet = self.createWalletFromCoinsData(coinsData, coinNames); // only for mock data this here?
 
           self.setState({
             coinsData: coinsData,
-            wallet: wallet,
+            // wallet: wallet, // mock only
             coinFullNames: coinFullNames.slice()
           });
         })
@@ -129,6 +135,150 @@ class App extends React.Component {
     }
   }
 
+  //This method is called inside retrieve wallet if no wallets are found.
+  createUser(callback) {
+    //mjw- untested
+    self = this;
+
+    axios
+      .post("/users/create", {
+        username: localStorage.name
+      })
+      .then(function(response) {
+        console.log("new user created");
+        //you can set state stuff here
+        //or alternatively you can invoke retrieveWallet
+        self.retrieveWallet(callback);
+      });
+  }
+
+  retrieveWallet(callback) {
+    //mjw- untested
+    //get (path = '/api/wallet/' +userID)
+    self = this;
+    axios
+      .get("/api/wallet/" + localStorage.name)
+      .then(function(response) {
+        console.log("GET wallet successful:");
+        if (response.data === "" || response.data.length === 0) {
+          console.log("No existing wallet. Creating new Wallet");
+          self.createUser(callback);
+        } else {
+          console.log("retrieveWallet() response.data=", response.data);
+          var serverWallet = response.data;
+          var wallet = self.convertServerWalletToClientWallet(serverWallet);
+          callback(wallet);
+        }
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
+  }
+
+  convertServerWalletToClientWallet(serverWallet) {
+    const wallet = {};
+
+    let serverWalletLength = serverWallet.length;
+
+    //load server wallet timestamps into client wallet.walletHistory;
+    const walletHistory = [];
+    for (let i = serverWalletLength - 1; i >= 0; i--) {
+      walletHistory.push({
+        timeStamp: serverWallet[i].timestamp,
+        coin1Name: coinNames[0],
+        coin2Name: coinNames[1],
+        coin3Name: coinNames[2],
+        coin4Name: coinNames[3],
+        coin5Name: coinNames[4],
+        coin1Value: serverWallet[i].c1_value,
+        coin2Value: serverWallet[i].c2_value,
+        coin3Value: serverWallet[i].c3_value,
+        coin4Value: serverWallet[i].c4_value,
+        coin5Value: serverWallet[i].c5_value,
+        coin1Amount: serverWallet[i].c1_amount,
+        coin2Amount: serverWallet[i].c2_amount,
+        coin3Amount: serverWallet[i].c3_amount,
+        coin4Amount: serverWallet[i].c4_amount,
+        coin5Amount: serverWallet[i].c5_amount,
+        coin1TotalUSD: serverWallet[i].c1_value * serverWallet[i].c1_amount,
+        coin2TotalUSD: serverWallet[i].c2_value * serverWallet[i].c2_amount,
+        coin3TotalUSD: serverWallet[i].c3_value * serverWallet[i].c3_amount,
+        coin4TotalUSD: serverWallet[i].c4_value * serverWallet[i].c4_amount,
+        coin5TotalUSD: serverWallet[i].c5_value * serverWallet[i].c5_amount
+      });
+    }
+    wallet.walletHistory = walletHistory.slice();
+
+    //load server wallet last timestamp data as the current wallet.
+    wallet.coins = [];
+    for (let i = 0; i < 5; i++) {
+      wallet.coins.push({
+        amount: eval(`walletHistory[serverWalletLength-1].coin${i + 1}Amount`),
+        value: eval(`walletHistory[serverWalletLength-1].coin${i + 1}Value`),
+        name: coinNames[i]
+      });
+    }
+    wallet.timeStamp = wallet.walletHistory[serverWalletLength - 1].timeStamp;
+
+    return wallet;
+  }
+
+  saveWallet(wallet) {
+    //mjw- untested
+    let self = this;
+    axios
+      .patch("/api/wallet/" + localStorage.name, {
+        c1: wallet.coins[0].amount,
+        c2: wallet.coins[1].amount,
+        c3: wallet.coins[2].amount,
+        c4: wallet.coins[3].amount,
+        c5: wallet.coins[4].amount,
+        timestamp: wallet.timeStamp
+      })
+      .then(function(response) {
+        console.log("saveWallet: patched, response=", response);
+        //self.setState({wallet:wallet});
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
+  }
+
+  render() {
+    return auth0Client.isAuthenticated() ? (
+      <div>
+        <Link to="/" onClick={auth0Client.signOut}>
+          Logout
+        </Link>
+        <button onClick={auth0Client.handleAuthentication}>Click me</button>
+        <h3>Welcome to Cryptex!</h3>
+        <Main
+          coinsData={this.state.coinsData}
+          wallet={this.state.wallet}
+          coinFullNames={this.state.coinFullNames}
+        />
+        <Wallet
+          wallet={this.state.wallet}
+          coinFullNames={this.state.coinFullNames}
+        />
+        <Add
+          handleUpdateCoinAmounts={this.handleUpdateCoinAmounts}
+          coinFullNames={this.state.coinFullNames}
+        />
+        <div>
+          <footer>Micah Weiss, James Dempsey, Chris Athanas</footer>
+        </div>
+      </div>
+    ) : (
+      <div>
+        <div>Welcome to your Crypto Profile Management Client!</div>
+        <Link to="/home">See your profile here</Link> {"<------->"}
+        <Link to="/">Link not working? log in here</Link>
+      </div>
+    );
+  }
+
+  // For mock and testing
   createMockWalletAndCoinsDataAndCoinNames() {
     // create random data for each coin and create a wallet history
     const coinsData = this.createMockCoinsData();
@@ -137,6 +287,7 @@ class App extends React.Component {
     return { wallet, coinsData, coinNames };
   }
 
+  // For mock and testing
   createWalletFromCoinsData(coinsData, coinNames) {
     const walletHistory = [];
     for (let i = 50; i >= 0; i--) {
@@ -196,6 +347,7 @@ class App extends React.Component {
     return wallet;
   }
 
+  // for mock and testing
   createMockCoinsData() {
     const coinsData = [];
     for (let i = 50; i >= 0; i--) {
@@ -210,95 +362,6 @@ class App extends React.Component {
       coinsData.push(item);
     }
     return coinsData;
-  }
-
-  //This method is called inside retrieve wallet if no wallets are found.
-  createUser() {
-    //mjw- untested
-    axios
-      .post("/users/create", {
-        username: localStorage.name
-      })
-      .then(function(response) {
-        console.log("new user created");
-        //you can set state stuff here
-        //or alternatively you can invoke retrieveWallet
-      });
-  }
-
-  retrieveWallet() {
-    //mjw- untested
-    //get (path = '/api/wallet/' +userID)
-    axios
-      .get("/api/wallets/" + localStorage.name)
-      .then(function(response) {
-        console.log("GET wallet successful:");
-        if (response.body === "") {
-          console.log("No existing wallets. Creating new Wallet");
-          this.createUser();
-        } else {
-          console.log("Here is you wallet");
-          //set state stuff here
-        }
-      })
-      .catch(function(error) {
-        console.log(error);
-      });
-  }
-
-  setCoins(c1, c2, c3, c4, c5) {
-    //mjw- untested
-    axios
-      .patch("/api/wallets/" + localStorage.name, {
-        c1: c1,
-        c2: c2,
-        c3: c3,
-        c4: c4,
-        c5: c5
-      })
-      .then(function(response) {
-        console.log("Did we patch it?");
-        console.log(response);
-      })
-      .catch(function(error) {
-        console.log(error);
-      });
-  }
-
-  render() {
-    return auth0Client.isAuthenticated() ? (
-      <div>
-        <Link to="/" onClick={auth0Client.signOut}>
-          Logout
-        </Link>
-        <button onClick={auth0Client.handleAuthentication}>Click me</button>
-        <h3>Welcome to Cryptex!</h3>
-        <Main
-          coinsData={this.state.coinsData}
-          wallet={this.state.wallet}
-          coinFullNames={this.state.coinFullNames}
-        />
-        <div>
-        <Add
-          handleUpdateCoinAmounts={this.handleUpdateCoinAmounts}
-          coinFullNames={this.state.coinFullNames}
-        />
-        <Wallet
-          wallet={this.state.wallet}
-          coinFullNames={this.state.coinFullNames}
-        />
-        </div>
-        <div>
-          <footer>Micah Weiss, James Dempsey, Chris Athanas</footer>
-        </div>
-      </div>
-    ) : (
-      <div>
-        <div>Welcome to your Crypto Profile Management Client!</div>
-        <Link to="/home">See your profile here</Link> {"<------->"}
-        <Link to="/">Link not working? log in here</Link>
-      </div>
-    );
   }
 }
 
