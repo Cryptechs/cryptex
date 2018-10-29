@@ -37,7 +37,6 @@ class App extends React.Component {
     if (!auth0Client.isAuthenticated()) {
       console.log("im here");
     }
-    //call get(localstorage.name)
 
     // // create Mock coin data -- Leave here for testing
     // var {

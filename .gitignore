@@ -5,4 +5,3 @@ bower_components/
 build/
 client/dist/bundle.js
 client/config/config.js
-database/config/dbconfig.js
