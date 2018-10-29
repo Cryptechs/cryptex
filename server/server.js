@@ -7,6 +7,7 @@ const knex = require("../database/knex");
 const jwt = require("express-jwt");
 const jwtAuthz = require("express-jwt-authz");
 const jwksRsa = require("jwks-rsa");
+const ALPHA_ADVANTAGE_API_KEY = require('../database/config/dbconfig.js')
 let port = process.env.PORT;
 if (port == null || port == "") {
     port = 3000;
@@ -113,27 +114,31 @@ app.patch("/api/wallet/:id", (req, res) => {
     console.log("updating current wallet");
     console.log("params", req.params);
     console.log("req body:", req.body);
-    knex("wallets")
-        .where({
-            user_id: req.params.id,
-            timestamp: req.body.timestamp
-        })
-        .update({
-            c1_amount: req.body.c1,
-            c2_amount: req.body.c2,
-            c3_amount: req.body.c3,
-            c4_amount: req.body.c4,
-            c5_amount: req.body.c5
-        })
-        .then(results => {
-            console.log("success");
-            res.status(201);
-            res.send("You done patched it!");
-        })
-        .catch(err => {
-            console.log("Error updating wallet", err);
-            res.status(404);
-            res.send("Error updating wallet: ", err);
+    knex('wallets').where('user_id', req.params.id).select().orderBy('timestamp', 'desc').limit(1)
+        .then((recentRow) => { //now that we have the most recent row for a username
+            console.log('recentRow', recentRow);
+            knex("wallets")
+                .where({
+                    user_id: req.params.id,
+                    timestamp: recentRow[0].timestamp,
+                })
+                .update({
+                    c1_amount: req.body.c1,
+                    c2_amount: req.body.c2,
+                    c3_amount: req.body.c3,
+                    c4_amount: req.body.c4,
+                    c5_amount: req.body.c5
+                })
+                .then(results => {
+                    console.log("success");
+                    res.status(201);
+                    res.send("You done patched it!");
+                })
+                .catch(err => {
+                    console.log("Error updating wallet", err);
+                    res.status(404);
+                    res.send("Error updating wallet: ", err);
+                });
         });
 });
 
@@ -201,9 +206,9 @@ const getLiveCoinData = () => { //
                                                 timestamp: output.timestamp,
                                                 c1_amount: recentRow[0].c1_amount,
                                                 c2_amount: recentRow[0].c2_amount,
-                                                c4_amount: recentRow[0].c3_amount,
-                                                c5_amount: recentRow[0].c4_amount,
-                                                c3_amount: recentRow[0].c5_amount,
+                                                c3_amount: recentRow[0].c3_amount,
+                                                c4_amount: recentRow[0].c4_amount,
+                                                c5_amount: recentRow[0].c5_amount,
                                             })
                                             .then(() => {
                                                 console.log('Updated user', resNames[i].user_id)
@@ -225,3 +230,8 @@ const getLiveCoinData = () => { //
 app.listen(port, function () {
     console.log('listening on port ' + port + '!');
 });
+
+setInterval(() => {
+    console.log('tick');
+    getLiveCoinData();
+}, 70000)

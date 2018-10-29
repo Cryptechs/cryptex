@@ -228,7 +228,7 @@ class App extends React.Component {
 
     //load server wallet timestamps into client wallet.walletHistory;
     const walletHistory = [];
-    for (let i = serverWalletLength - 1; i >= 0; i--) {
+    for (let i = 0; i < serverWalletLength; i++) {
       walletHistory.push({
         timeStamp: serverWallet[i].timestamp,
         coin1Name: coinNames[0],
@@ -259,8 +259,12 @@ class App extends React.Component {
     wallet.coins = [];
     for (let i = 0; i < 5; i++) {
       wallet.coins.push({
-        amount: eval(`walletHistory[serverWalletLength-1].coin${i + 1}Amount`),
-        value: eval(`walletHistory[serverWalletLength-1].coin${i + 1}Value`),
+        amount: eval(
+          `walletHistory[${serverWalletLength - 1}].coin${i + 1}Amount`
+        ),
+        value: eval(
+          `walletHistory[${serverWalletLength - 1}].coin${i + 1}Value`
+        ),
         name: coinNames[i]
       });
       this.state.coinFullNames[i] = coinNames[i];
