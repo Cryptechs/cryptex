@@ -8,7 +8,7 @@ module.exports = {
     migrations: {
       directory: __dirname + '/database/migrations',
     },
-    seeds:{
+    seeds: {
       directory: __dirname + '/database/seeds'
     }
   },
@@ -16,11 +16,11 @@ module.exports = {
 
   production: {
     client: 'pg',
-    connection: 'postgres://localhost/cryptex', //production will need some deployement in the tutorial: process.env.DATABASE_URL
+    connection: process.env.DATABASE_URL, //production will need some deployement in the tutorial: process.env.DATABASE_URL
     migrations: {
       directory: __dirname + '/database/migrations',
     },
-    seeds:{
+    seeds: {
       directory: __dirname + '/database/seeds/production'
     }
   },
