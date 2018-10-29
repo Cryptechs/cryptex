@@ -5,6 +5,7 @@ const Wallet = props => {
 
   if (wallet === undefined || wallet.coins === undefined)
     return <div>Loading data...</div>;
+  // if you went over api call count and didnt get data back
   else {
     return (
       <div className="wallet">

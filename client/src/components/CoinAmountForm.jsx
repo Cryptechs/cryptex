@@ -1,5 +1,5 @@
 import React from "react";
-
+//adding coins to user wallets
 class CoinAmountForm extends React.Component {
   constructor(props) {
     super(props);
@@ -14,7 +14,6 @@ class CoinAmountForm extends React.Component {
   }
 
   handleSubmit(event) {
-    // alert("A name was submitted: " + this.state.value);
     event.preventDefault();
     this.props.handleUpdateCoinAmounts(this.props.coinUIName, this.state.value);
   }

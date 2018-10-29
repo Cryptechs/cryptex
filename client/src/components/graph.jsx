@@ -13,7 +13,7 @@ import {
   Tooltip,
   Legend
 } from "recharts";
-
+//user wallet graph
 const Graph = props => {
   if (props.data === undefined || props.data.length === 0)
     return <div>loading data....</div>;

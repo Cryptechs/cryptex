@@ -1,1 +1,6 @@
-//Look at me, I'm a model?
+//why am i here?
+
+
+//all the database calls in server.js should be in here. 
+
+//FIX IT

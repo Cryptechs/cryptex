@@ -36,6 +36,7 @@ import { fitWidth } from "react-stockcharts/lib/helper";
 import { last, toObject } from "react-stockcharts/lib/utils";
 import { saveInteractiveNodes, getInteractiveNodes } from "./interactiveutils";
 
+//see react-stockcharts docs for any assistance here. whole thing is copypasta
 const macdAppearance = {
   stroke: {
     macd: "#FF0000",

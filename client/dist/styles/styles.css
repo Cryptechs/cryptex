@@ -1,3 +1,4 @@
+/* make me better */
 h1 {
     text-align: center;
 }
@@ -31,7 +32,7 @@ h1 {
     display: inline-block;
     height: 110px;
     width: 60%;
-    float: left; 
+    float: left;
     border: 5px solid green;
     border-radius: 10px;
     position: relative;
@@ -46,3 +47,5 @@ footer {
     position: absolute; */
     height: 40px;
 }
+
+/* make me better */

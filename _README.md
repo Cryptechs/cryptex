@@ -54,3 +54,36 @@ View the project roadmap [here](LINK_TO_PROJECT_ISSUES)
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
+
+-----------------------------------------------------------------------------------------------ADDED NOTES
+
+# Client
+
+- Gets wallet data from user (wallet coin amounts at each unit of time)
+- Gets live coin data from AlphaAdvantage API
+
+- Need config.js with your own API key for Alpha Advantage.co API
+- Limit of 5 requests per minute and 500 a month for each email
+
+# file: index.jsx
+
+- auth0Client.handleAuthentication is Async function, which is why when user logs-in which is why the user has to click again to see the page.
+
+# Authentication
+
+- See James Dempsey for auth0 specifications and insights
+
+# Server
+
+- Can have multiple users
+- Saves 5 coins for each user
+- Server gets current value of coins every 70 seconds
+
+## Advanced Suggestions
+
+- User chooses which coins to track
+- would involve converting coin1...coin5 variables to arrays of coins[]
+- Add tests
+- Coin forms easier
+- Make API key rotator to use multiple API keys
+- Refactor server to update coin every hour

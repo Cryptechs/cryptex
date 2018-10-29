@@ -3,19 +3,11 @@ import axios from "axios";
 import Wallet from "./components/wallet.jsx";
 import Main from "./components/main.jsx";
 import Add from "./components/add.jsx";
-import { isAbsolute } from "path";
 import ALPHA_ADVANTAGE_API_KEY from "../config/config.js";
 import auth0Client from "./authZero";
-import { Link, Redirect } from "react-router-dom";
-import { create } from "domain";
-import { runInThisContext } from "vm";
-
-// candlestick charting /
-import { render } from "react-dom";
-import { getData } from "./components/utils";
+import { Link } from "react-router-dom";
 
 const coinNames = ["BTC", "LTC", "ETH", "XRP", "EOS"];
-
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -25,34 +17,20 @@ class App extends React.Component {
       wallet: {},
       coinCandlestickData: []
     };
-
     this.handleUpdateCoinAmounts = this.handleUpdateCoinAmounts.bind(this);
   }
 
   componentDidMount() {
-    console.log("Component Mounted");
-    auth0Client.handleAuthentication();
-    // console.log(localStorage, localStorage.profile);
+    auth0Client.handleAuthentication(); //takes time to come back as true
+    // console.log(localStorage, localStorage.profile); //username stored here
     console.log(auth0Client.isAuthenticated());
     if (!auth0Client.isAuthenticated()) {
-      console.log("im here");
+      console.log("user is NOT authorized");
     }
 
-    // // create Mock coin data -- Leave here for testing
-    // var {
-    //   wallet,
-    //   coinsData,
-    //   coinNames
-    // } = this.createMockWalletAndCoinsDataAndCoinNames();
-
     this.retrieveWallet(wallet => {
+      //grab logged in users wallet, set it to state, and grab live coin data from api
       this.getLiveCoinDataAndCoinFullNamesFromAPI(coinNames);
-
-      // getData().then(candleData => {
-      //   console.log("candleData=", candleData);
-      //   this.setState({ candleData: candleData });
-      // });
-
       this.setState({
         wallet: wallet
       });
@@ -82,16 +60,17 @@ class App extends React.Component {
         1}TotalUSD = ${amount} * wallet.coins[${coinNameIdx}].value`
     );
 
-    // These next 2 lines cause React to update the UI
+    // These next 2 lines cause React to update the UI, by giving it a full new array instead of replacing an element in the array.
     this.state.wallet.walletHistory = this.state.wallet.walletHistory.slice();
     this.state.wallet.coins = this.state.wallet.coins.slice();
     this.setState({ wallet: wallet });
 
-    // send this new wallet to the server
+    // send this new wallet to the server,FIX ME: may not be necessary
     this.saveWallet(wallet);
   }
 
   getLiveCoinDataAndCoinFullNamesFromAPI(coinNames) {
+    //read function title, gets daily totals (not historical)
     let coinFullNames = coinNames.slice();
     let coinsData = [];
     const candlestickCoinsData = [];
@@ -105,7 +84,7 @@ class App extends React.Component {
             ALPHA_ADVANTAGE_API_KEY
         )
         .then(function(response) {
-          //TODO - check for errors from AlphaAdvantage
+          //TODO - check for errors from AlphaAdvantage : limited to 5 req per minute, you will see this error often :)
           console.log("AlphaAdvantage response:", response.data);
 
           // get the crypto ticker name from the response object
@@ -117,6 +96,7 @@ class App extends React.Component {
             console.log(
               "Bad Coin Index for ",
               response.data["Meta Data"]["2. Digital Currency Code"]
+              //FIX ME return here?
             );
           }
 
@@ -127,7 +107,7 @@ class App extends React.Component {
                 Object.keys(
                   response.data["Time Series (Digital Currency Daily)"]
                 )[i]
-              ]["4a. close (USD)"];
+              ]["4a. close (USD)"]; //closing data, theres also opening and low, high, all sorts of stuff. (Basic chart graph)
             // Use the index of the coin from the response
             if (coinsData[i] === undefined) coinsData[i] = {};
             eval(`coinsData[${i}].coin${coinIndex + 1} = ${data};`);
@@ -136,9 +116,7 @@ class App extends React.Component {
           coinFullNames[coinIndex] =
             response.data["Meta Data"]["3. Digital Currency Name"];
 
-          //let wallet = self.createWalletFromCoinsData(coinsData, coinNames); // only for mock data
-
-          // Candlestick data format
+          // Candlestick data format, needs a lot more info than basic chart graph.
           let timeSeriesKeys = Object.keys(
             response.data["Time Series (Digital Currency Daily)"]
           );
@@ -156,7 +134,7 @@ class App extends React.Component {
                 timeSeriesDate[1] - 1, // in js Date, months are zero based
                 timeSeriesDate[2]
               ), // Month, Day, Year
-              open: +row["1a. open (USD)"],
+              open: +row["1a. open (USD)"], // + is a trick to convert to a number (comes in as a string)
               high: +row["2a. high (USD)"],
               low: +row["3a. low (USD)"],
               close: +row["4a. close (USD)"],
@@ -171,7 +149,6 @@ class App extends React.Component {
           self.setState({
             candlestickCoinsData: candlestickCoinsData,
             coinsData: coinsData,
-            // wallet: wallet, // mock only
             coinFullNames: coinFullNames.slice()
           });
         })
@@ -183,34 +160,29 @@ class App extends React.Component {
 
   //This method is called inside retrieve wallet if no wallets are found.
   createUser(callback) {
-    //mjw- untested
-    self = this;
+    self = this; // need to assign context to a variable, 'this' gets lost farther down in scope
 
     axios
       .post("/users/create", {
         username: localStorage.name
       })
       .then(function(response) {
-        console.log("new user created");
-        //you can set state stuff here
-        //or alternatively you can invoke retrieveWallet
+        console.log("new user created: ", localStorage.name);
         self.retrieveWallet(callback);
       });
   }
 
   retrieveWallet(callback) {
-    //mjw- untested
-    //get (path = '/api/wallet/' +userID)
-    self = this;
+    self = this; //see above
     axios
       .get("/api/wallet/" + localStorage.name)
       .then(function(response) {
-        console.log("GET wallet successful:");
+        console.log("GET request fired from index.jsx");
         if (response.data === "" || response.data.length === 0) {
           console.log("No existing wallet. Creating new Wallet");
           self.createUser(callback);
         } else {
-          console.log("retrieveWallet() response.data=", response.data);
+          console.log("retrieveWallet() success response.data=", response.data);
           var serverWallet = response.data;
           var wallet = self.convertServerWalletToClientWallet(serverWallet);
           callback(wallet);
@@ -236,7 +208,7 @@ class App extends React.Component {
         coin3Name: coinNames[2],
         coin4Name: coinNames[3],
         coin5Name: coinNames[4],
-        coin1Value: serverWallet[i].c1_value,
+        coin1Value: serverWallet[i].c1_value, // refactor to arrays? (n coins instead of five coins)
         coin2Value: serverWallet[i].c2_value,
         coin3Value: serverWallet[i].c3_value,
         coin4Value: serverWallet[i].c4_value,
@@ -255,7 +227,7 @@ class App extends React.Component {
     }
     wallet.walletHistory = walletHistory.slice();
 
-    //load server wallet last timestamp data as the current wallet.
+    //load server wallet newest (last) timestamp data as the current wallet. (latest timestamps are pushed to the end)
     wallet.coins = [];
     for (let i = 0; i < 5; i++) {
       wallet.coins.push({
@@ -270,16 +242,13 @@ class App extends React.Component {
       this.state.coinFullNames[i] = coinNames[i];
     }
     wallet.timeStamp = wallet.walletHistory[serverWalletLength - 1].timeStamp;
-
     return wallet;
   }
 
   saveWallet(wallet) {
-    //mjw- untested
-    let self = this;
     axios
       .patch("/api/wallet/" + localStorage.name, {
-        // Fix also save values of coins here?
+        // Fix also save values of coins here? potential refactor. user server or client time? timestamp current overwritten by server
         c1: wallet.coins[0].amount,
         c2: wallet.coins[1].amount,
         c3: wallet.coins[2].amount,
@@ -289,7 +258,6 @@ class App extends React.Component {
       })
       .then(function(response) {
         console.log("saveWallet: patched, response=", response);
-        //self.setState({wallet:wallet});
       })
       .catch(function(error) {
         console.log(error);
@@ -297,7 +265,7 @@ class App extends React.Component {
   }
 
   render() {
-    return auth0Client.isAuthenticated() ? (
+    return auth0Client.isAuthenticated() ? ( //if user is not authenticated, they only have access to to the footer
       <div>
         <Link to="/" onClick={auth0Client.signOut}>
           Logout
@@ -323,99 +291,15 @@ class App extends React.Component {
         </div>
       </div>
     ) : (
+      //---------------------------------------------------------------------------------------- footer here
       <div>
         <div>Welcome to your Crypto Profile Management Client!</div>
-        <Link to="/home">See your profile here</Link> {"<------->"}
+        <Link to="/home">See your profile here</Link> {"<------->"}{" "}
+        {/*only renders if user is authenticaed, and the redirects to main content */}
         <Link to="/">Link not working? log in here</Link>
       </div>
     );
   }
-
-  // // For mock and testing
-  // createMockWalletAndCoinsDataAndCoinNames() {
-  //   // create random data for each coin and create a wallet history
-  //   const coinsData = this.createMockCoinsData();
-  //   let wallet = this.createWalletFromCoinsData(coinsData, coinNames);
-
-  //   return { wallet, coinsData, coinNames };
-  // }
-
-  // // For mock and testing
-  // createWalletFromCoinsData(coinsData, coinNames) {
-  //   const walletHistory = [];
-  //   for (let i = 50; i >= 0; i--) {
-  //     let coin1Value = coinsData[i].coin1;
-  //     let coin2Value = coinsData[i].coin2;
-  //     let coin3Value = coinsData[i].coin3;
-  //     let coin4Value = coinsData[i].coin4;
-  //     let coin5Value = coinsData[i].coin5;
-
-  //     let coin1Amount = 0.01 * Math.random() * (40 - i);
-  //     let coin2Amount = 3 * Math.random() * (40 - i);
-  //     let coin3Amount = 4 * Math.random() * (40 - i);
-  //     let coin4Amount = 2 * Math.random() * (40 - i);
-  //     let coin5Amount = 7 * Math.random() * (40 - i);
-
-  //     let coin1TotalUSD = coin1Value * coin1Amount;
-  //     let coin2TotalUSD = coin2Value * coin2Amount;
-  //     let coin3TotalUSD = coin3Value * coin3Amount;
-  //     let coin4TotalUSD = coin4Value * coin4Amount;
-  //     let coin5TotalUSD = coin5Value * coin5Amount;
-
-  //     walletHistory.push({
-  //       timeStamp: "Day -" + i,
-  //       coin1Name: coinNames[0],
-  //       coin2Name: coinNames[1],
-  //       coin3Name: coinNames[2],
-  //       coin4Name: coinNames[3],
-  //       coin5Name: coinNames[4],
-  //       coin1Value: coin1Value,
-  //       coin2Value: coin2Value,
-  //       coin3Value: coin3Value,
-  //       coin4Value: coin4Value,
-  //       coin5Value: coin5Value,
-  //       coin1Amount: coin1Amount,
-  //       coin2Amount: coin2Amount,
-  //       coin3Amount: coin3Amount,
-  //       coin4Amount: coin4Amount,
-  //       coin5Amount: coin5Amount,
-  //       coin1TotalUSD: coin1TotalUSD,
-  //       coin2TotalUSD: coin2TotalUSD,
-  //       coin3TotalUSD: coin3TotalUSD,
-  //       coin4TotalUSD: coin4TotalUSD,
-  //       coin5TotalUSD: coin5TotalUSD
-  //     });
-  //   }
-  //   // Mock wallet data (This is the current state of the wallet, which is array elem 50 of the history of the wallet)
-  //   let wallet = {};
-  //   wallet.coins = [];
-  //   for (let i = 0; i < 5; i++) {
-  //     wallet.coins.push({
-  //       amount: eval(`walletHistory[50].coin${i + 1}Amount`),
-  //       value: eval(`walletHistory[50].coin${i + 1}Value`),
-  //       name: coinNames[i]
-  //     });
-  //   }
-  //   wallet.walletHistory = walletHistory;
-  //   return wallet;
-  // }
-
-  // // for mock and testing
-  // createMockCoinsData() {
-  //   const coinsData = [];
-  //   for (let i = 50; i >= 0; i--) {
-  //     let item = {
-  //       timestamp: "Day -" + i,
-  //       coin1: Math.random() * 2000,
-  //       coin2: Math.random() * 2000,
-  //       coin3: Math.random() * 2000,
-  //       coin4: Math.random() * 2000,
-  //       coin5: Math.random() * 2000
-  //     };
-  //     coinsData.push(item);
-  //   }
-  //   return coinsData;
-  // }
 }
 
 export default App;

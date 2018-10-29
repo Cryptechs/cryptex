@@ -5,7 +5,7 @@ class Add extends React.Component {
   constructor(props) {
     super(props);
   }
-
+  //refactor to map through instead of five blocks of the same code
   render() {
     return (
       <div>

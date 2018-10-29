@@ -1,9 +1,6 @@
 import React from "react";
 import Graph from "./graph.jsx";
 import GraphCoin from "./graphCoin.jsx";
-
-// candlestick
-import { render } from "react-dom";
 import Chart from "./graphCandlestickChart.jsx";
 
 class Main extends React.Component {
@@ -17,7 +14,7 @@ class Main extends React.Component {
   }
 
   changeView(view, event) {
-    console.log("*** changeView/index.jsx: option, view=", view);
+    console.log("*** changeView/index.jsx: option, view=", view); // so you see whats coming through as the view
     this.setState({
       view: view
     });
@@ -37,7 +34,7 @@ class Main extends React.Component {
           <button onClick={() => this.changeView("coin5")}>Coin 5</button>
         </div>
         {this.props.candlestickCoinsData === undefined ? (
-          <div>Need to refresh to load live data...</div>
+          <div>Need to refresh to load live data...</div> // when api calls are maxed out
         ) : (
           ""
         )}

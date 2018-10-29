@@ -1,15 +1,14 @@
 import auth0 from 'auth0-js';
 
-
+//lots and lots to talk about here, talk to james D for in depth stuff.
 class Auth {
     constructor() {
         this.auth0 = new auth0.WebAuth({
             // the following three lines MUST be updated
-            domain: 'james-dempsey.auth0.com',
-            audience: 'https://james-dempsey.auth0.com/userinfo',
-            clientID: 'NbD9tWynHT5BxpsIksRslk7HiRrmBSYY',
-            redirectUri: 'https://fathomless-hollows-36153.herokuapp.com/home',
-            //returnTo: 'http://127.0.0.1:3000/',
+            domain: 'FILL_ME_IN', //you need to make your own auth0 account, see me.
+            audience: 'https://FILL_ME_IN/userinfo',
+            clientID: 'SECRET_STUFF',
+            redirectUri: 'FILL_ME_IN',
             responseType: 'token id_token',
             scope: 'openid profile'
         });
@@ -34,10 +33,8 @@ class Auth {
             if (authResult && authResult.accessToken && authResult.idToken) {
                 this.setSession(authResult);
                 console.log(authResult)
-                //history.replace('/home');
             } else if (err) {
-                // history.replace('/home');
-                console.log(err);
+                console.log(err, "handleauth err");
             }
         });
     }
@@ -47,9 +44,7 @@ class Auth {
         localStorage.setItem('access_token', authResult.accessToken);
         localStorage.setItem('id_token', authResult.idToken);
         localStorage.setItem('expires_at', expiresAt);
-        localStorage.setItem('name', authResult.idTokenPayload.name);
-        // navigate to the home route
-        //history.replace('/home');
+        localStorage.setItem('name', authResult.idTokenPayload.name); // this gives you access to the clients username
     }
 
     isAuthenticated() {
@@ -58,28 +53,21 @@ class Auth {
         let expiresAt = JSON.parse(localStorage.getItem('expires_at'));
         return new Date().getTime() < expiresAt;
     }
-
-    signIn() {
+    signIn() { // use to redirect and login
         this.auth0.authorize();
         this.handleAuthentication();
     }
-
     signOut() {
         // Clear Access Token and ID Token from local storage
-        localStorage.removeItem('access_token');
+        localStorage.removeItem('access_token'); //username is no longer detected in local storage
         localStorage.removeItem('id_token');
         localStorage.removeItem('expires_at');
         localStorage.removeItem('name')
         this.idToken = null;
         this.profile = null;
         this.expiresAt = null;
-        this.auth0.logout()
-
-        // navigate to the home route
-        //history.replace('/');
+        this.auth0.logout() // see james, this also redirects to '/' page
     }
 }
-
 const auth0Client = new Auth();
-
 export default auth0Client;

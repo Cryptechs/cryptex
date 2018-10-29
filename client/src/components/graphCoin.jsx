@@ -48,3 +48,6 @@ const GraphCoin = props => {
 };
 
 export default GraphCoin;
+
+//'ToDo'
+//maybe change size of graph to fit page better

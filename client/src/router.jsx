@@ -19,3 +19,5 @@ ReactDOM.render(
   document.getElementById("app")
 );
 //export default Router;
+
+//link to login and home page(protected) imports everything so its the page webpack points to. automatically renders / page (welcome page)

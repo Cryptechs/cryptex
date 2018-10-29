@@ -1,4 +1,7 @@
-import { isNotDefined, isDefined } from "react-stockcharts/lib/utils";
+import {
+  isNotDefined,
+  isDefined
+} from "react-stockcharts/lib/utils";
 
 export function saveInteractiveNode(chartId) {
   return node => {
@@ -11,7 +14,7 @@ export function handleSelection(type, chartId) {
     const key = `${type}_${chartId}`;
     const interactive = this.state[key].map((each, idx) => {
       return {
-        //...each,
+        //...each, FIX ME MAYBE
         each: each.apply(null, each),
         selected: selectionArray[idx]
       };
@@ -33,9 +36,13 @@ export function saveInteractiveNodes(type, chartId) {
       console.log("this.interactiveNodes:", this.interactiveNodes);
       // eslint-disable-next-line fp/no-mutation
       this.interactiveNodes = {
-        // ...this.interactiveNodes,
+        // ...this.interactiveNodes, FIX ME, check the docs, stutter problem here i think
         interactiveNodes: this.interactiveNodes,
-        [key]: { type, chartId, node }
+        [key]: {
+          type,
+          chartId,
+          node
+        }
       };
     }
   };
