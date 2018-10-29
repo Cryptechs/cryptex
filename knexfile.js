@@ -1,5 +1,4 @@
 // Update with your config settings.
-console.log('Migration file called');
 module.exports = {
 
   development: {
