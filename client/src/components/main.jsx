@@ -37,7 +37,7 @@ class Main extends React.Component {
           <button onClick={() => this.changeView("coin5")}>Coin 5</button>
         </div>
         {this.props.candlestickCoinsData === undefined ? (
-          <div>Need to refresh to load data...</div>
+          <div>Need to refresh to load live data...</div>
         ) : (
           ""
         )}
@@ -46,17 +46,23 @@ class Main extends React.Component {
             data={this.props.wallet.walletHistory}
             coinFullNames={this.props.coinFullNames}
           />
-        ) : this.state.view !== "coin1" ? (
-          <GraphCoin
-            data={this.props.coinsData}
-            coinName={this.state.view}
-            coinFullNames={this.props.coinFullNames}
-          />
+        ) : this.state.view === "coin1" || this.state.view === "coin2" ? (
+          <div>
+            Researching: {this.props.coinFullNames[coinIdxToDisplay]}
+            <Chart
+              type={"svg"}
+              data={this.props.candlestickCoinsData[coinIdxToDisplay]}
+            />
+          </div>
         ) : (
-          <Chart
-            type={"svg"}
-            data={this.props.candlestickCoinsData[coinIdxToDisplay]}
-          />
+          <div>
+            Researching: {this.props.coinFullNames[coinIdxToDisplay]}
+            <GraphCoin
+              data={this.props.coinsData}
+              coinName={this.state.view}
+              coinFullNames={this.props.coinFullNames}
+            />
+          </div>
         )}
       </div>
     );

@@ -168,8 +168,6 @@ class App extends React.Component {
             candlestickCoinsData[coinIndex].push(formattedRow);
           }
 
-          debugger;
-
           self.setState({
             candlestickCoinsData: candlestickCoinsData,
             coinsData: coinsData,
