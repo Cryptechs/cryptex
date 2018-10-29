@@ -8,7 +8,7 @@ class Auth {
             domain: 'james-dempsey.auth0.com',
             audience: 'https://james-dempsey.auth0.com/userinfo',
             clientID: 'NbD9tWynHT5BxpsIksRslk7HiRrmBSYY',
-            redirectUri: 'hhttps://fathomless-hollows-36153.herokuapp.com/home',
+            redirectUri: 'https://fathomless-hollows-36153.herokuapp.com/home',
             //returnTo: 'http://127.0.0.1:3000/',
             responseType: 'token id_token',
             scope: 'openid profile'
