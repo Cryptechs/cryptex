@@ -3,25 +3,24 @@ var bodyParser = require("body-parser");
 const axios = require("axios");
 var path = require("path");
 var app = express();
-const knex = require('../database/knex')
-const jwt = require('express-jwt');
-const jwtAuthz = require('express-jwt-authz');
-const jwksRsa = require('jwks-rsa');
-const ALPHA_ADVANTAGE_API_KEY = require('../database/config/dbconfig.js');
+const knex = require("../database/knex");
+const jwt = require("express-jwt");
+const jwtAuthz = require("express-jwt-authz");
+const jwksRsa = require("jwks-rsa");
+const ALPHA_ADVANTAGE_API_KEY = require('../database/config/dbconfig.js')
 let port = process.env.PORT;
 if (port == null || port == "") {
     port = 3000;
 }
 
 
-
-app.use(express.static(__dirname + '/../client/dist'));
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({
-    extended: false
-
-}));
-
+app.use(express.static(__dirname + "/../client/dist"));
+app.use(bodyParser.json());
+app.use(
+    bodyParser.urlencoded({
+        extended: false
+    })
+);
 
 const checkJwt = jwt({
     // Dynamically provide a signing key
@@ -41,7 +40,6 @@ const checkJwt = jwt({
 });
 
 //createUser
-
 app.post("/users/create", (req, res) => {
     knex("users")
         .insert({
@@ -54,12 +52,11 @@ app.post("/users/create", (req, res) => {
                     "SELECT time_value FROM coin_values ORDER BY time_value DESC LIMIT 1;"
                 )
                 .then(results => {
-                    console.log(results)
                     knex("wallets")
                         .insert({
                             timestamp: results.rows[0].time_value,
                             user_id: req.body.username
-                        }) //currencies all default to zeros
+                        }) //currencies all default to zero
                         .then(() => {
                             console.log("wallet created");
                             res.send(
@@ -68,7 +65,6 @@ app.post("/users/create", (req, res) => {
                                 "with a zero wallet at",
                                 results.rows[0].time_value
                             );
-
                         });
                 });
         });
@@ -76,7 +72,6 @@ app.post("/users/create", (req, res) => {
 
 //retrieveWallet
 app.get("/api/wallet/:id", (req, res) => {
-    console.log(req)
     console.log("wallet get req");
     console.log("params", req.params);
 
@@ -116,44 +111,42 @@ app.get("/api/wallet/:id", (req, res) => {
 });
 
 app.patch("/api/wallet/:id", (req, res) => {
-    //MJW: On day of presentation, no longer uses timestamp in req.body (it's too old)
     console.log("updating current wallet");
     console.log("params", req.params);
     console.log("req body:", req.body);
-    
     knex('wallets').where('user_id', req.params.id).select().orderBy('timestamp', 'desc').limit(1)
-    .then((recentRow) => { //now that we have the most recent row for a username
-        console.log('PATCHING recentRow', recentRow)
-        knex("wallets")
-        .where({
-            user_id: req.params.id,
-            timestamp: recentRow.timestamp
-        })
-        .update({
-            c1_amount: req.body.c1,
-            c2_amount: req.body.c2,
-            c3_amount: req.body.c3,
-            c4_amount: req.body.c4,
-            c5_amount: req.body.c5
-        })
-        .then(results => {
-            console.log("success");
-            res.status(201);
-            res.send("You done patched it!");
-        })
-        .catch(err => {
-            console.log("Error updating wallet", err);
-            res.status(404)
-            res.send(err);
-        })
-    });
+        .then((recentRow) => { //now that we have the most recent row for a username
+            console.log('recentRow', recentRow);
+            knex("wallets")
+                .where({
+                    user_id: req.params.id,
+                    timestamp: recentRow[0].timestamp,
+                })
+                .update({
+                    c1_amount: req.body.c1,
+                    c2_amount: req.body.c2,
+                    c3_amount: req.body.c3,
+                    c4_amount: req.body.c4,
+                    c5_amount: req.body.c5
+                })
+                .then(results => {
+                    console.log("success");
+                    res.status(201);
+                    res.send("You done patched it!");
+                })
+                .catch(err => {
+                    console.log("Error updating wallet", err);
+                    res.status(404);
+                    res.send("Error updating wallet: ", err);
+                });
+        });
 });
 
+//bad get requests send you home
+app.get("/*", (err, res) => {
+    console.log("here!");
 
-//bad get requests send you home. you monster.
-app.get('/*', (err, res) => {
-    console.log('here!')
-    res.sendFile(path.join(__dirname, '../client/dist/index.html'))
+    res.sendFile(path.join(__dirname, "../client/dist/index.html"));
 });
 
 const getLiveCoinData = () => { //
@@ -213,9 +206,9 @@ const getLiveCoinData = () => { //
                                                 timestamp: output.timestamp,
                                                 c1_amount: recentRow[0].c1_amount,
                                                 c2_amount: recentRow[0].c2_amount,
-                                                c4_amount: recentRow[0].c3_amount,
-                                                c5_amount: recentRow[0].c4_amount,
-                                                c3_amount: recentRow[0].c5_amount,
+                                                c3_amount: recentRow[0].c3_amount,
+                                                c4_amount: recentRow[0].c4_amount,
+                                                c5_amount: recentRow[0].c5_amount,
                                             })
                                             .then(() => {
                                                 console.log('Updated user', resNames[i].user_id)
@@ -238,8 +231,7 @@ app.listen(port, function () {
     console.log('listening on port ' + port + '!');
 });
 
-getLiveCoinData();
 setInterval(() => {
-    console.log('Pinging the API for values');
+    console.log('tick');
     getLiveCoinData();
-}, 70000); //Recommended min 70sec setInterval
+}, 70000)
