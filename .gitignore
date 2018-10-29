@@ -3,4 +3,5 @@ bower_components/
 *.log
 
 build/
-dist/bundle.js
+client/dist/bundle.js
+client/config/config.js

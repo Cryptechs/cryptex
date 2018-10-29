@@ -18,28 +18,31 @@ h1 {
 }
 
 .wallet {
-    height: 100px;
+    display: inline-block;
+    height: 110px;
     width: 30%;
     float: right;
-    position: relative;
+    /* position: relative; */
     border: 5px solid blue;
     border-radius: 10px;
 }
 
 .addCoins {
-    height: 100px;
+    display: inline-block;
+    height: 110px;
     width: 60%;
-    float: left;
+    float: left; 
     border: 5px solid green;
     border-radius: 10px;
     position: relative;
 }
 
 footer {
+    display: inline-block;
     width: 100%;
     border: 5px solid purple;
     border-radius: 10px;
-    bottom: 0;
-    position: absolute;
-    height: 50px;
+    /* bottom: 0px;
+    position: absolute; */
+    height: 40px;
 }
