@@ -15,7 +15,6 @@ exports.seed = function(knex, Promise) {
         {user_id: 'james.dempsey420@gmail.com', timestamp: '2018-10-25 14:57:12', c1_amount: 9},
         {user_id: 'james.dempsey420@gmail.com', timestamp: '2018-10-25 15:57:12', c1_amount: 10},
         {user_id: 'james.dempsey420@gmail.com', timestamp: '2018-10-25 16:57:12', c1_amount: 10},
-        {user_id: 'micahjweiss@gmail.com', timestamp: '2018-10-25 16:57:12', c2_amount: 500},
       ]);
     });
 };

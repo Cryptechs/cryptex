@@ -20,7 +20,7 @@ exports.up = function(knex, Promise) {
     //the wallet info and amount of coins currently in the wallet
     .createTable('wallets', function(table) { 
         table.increments();
-        table.string('user_id').references('username').inTable('users').notNullable;
+        table.string('user_id').references('username').inTable('users');
         table.string('timestamp').references('time_value').inTable('coin_values');
         table.float('c1_amount', 12, 4).defaultTo(0);
         table.float('c2_amount', 12, 4).defaultTo(0);
