@@ -5,9 +5,7 @@
   "main": "index.jsx",
   "scripts": {
     "react-dev": "webpack -d --watch",
-    "server-dev": "nodemon server/server.js",
-    "start": "node server/server.js",
-    "heroku-postbuild": "webpack"
+    "server-dev": "nodemon server/server.js"
   },
   "repository": {
     "type": "git",

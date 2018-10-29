@@ -18,7 +18,6 @@ const Wallet = props => {
             <div key={idx}>
               {coinFullNames[idx]}
               :&nbsp;
-
               {i.amount.toFixed(3)} * ${i.value.toFixed(2)} = $
               {(i.amount * i.value).toFixed(2)}
             </div>

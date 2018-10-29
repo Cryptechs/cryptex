@@ -3,25 +3,23 @@ var bodyParser = require("body-parser");
 const axios = require("axios");
 var path = require("path");
 var app = express();
-const knex = require('../database/knex')
-const jwt = require('express-jwt');
-const jwtAuthz = require('express-jwt-authz');
-const jwksRsa = require('jwks-rsa');
-const ALPHA_ADVANTAGE_API_KEY = require('../database/config/dbconfig.js');
+const knex = require("../database/knex");
+const jwt = require("express-jwt");
+const jwtAuthz = require("express-jwt-authz");
+const jwksRsa = require("jwks-rsa");
 let port = process.env.PORT;
 if (port == null || port == "") {
     port = 3000;
 }
 
 
-
-app.use(express.static(__dirname + '/../client/dist'));
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({
-    extended: false
-
-}));
-
+app.use(express.static(__dirname + "/../client/dist"));
+app.use(bodyParser.json());
+app.use(
+    bodyParser.urlencoded({
+        extended: false
+    })
+);
 
 const checkJwt = jwt({
     // Dynamically provide a signing key
@@ -41,7 +39,6 @@ const checkJwt = jwt({
 });
 
 //createUser
-
 app.post("/users/create", (req, res) => {
     knex("users")
         .insert({
@@ -54,12 +51,11 @@ app.post("/users/create", (req, res) => {
                     "SELECT time_value FROM coin_values ORDER BY time_value DESC LIMIT 1;"
                 )
                 .then(results => {
-                    console.log(results)
                     knex("wallets")
                         .insert({
                             timestamp: results.rows[0].time_value,
                             user_id: req.body.username
-                        }) //currencies all default to zeros
+                        }) //currencies all default to zero
                         .then(() => {
                             console.log("wallet created");
                             res.send(
@@ -68,7 +64,6 @@ app.post("/users/create", (req, res) => {
                                 "with a zero wallet at",
                                 results.rows[0].time_value
                             );
-
                         });
                 });
         });
@@ -76,7 +71,6 @@ app.post("/users/create", (req, res) => {
 
 //retrieveWallet
 app.get("/api/wallet/:id", (req, res) => {
-    console.log(req)
     console.log("wallet get req");
     console.log("params", req.params);
 
@@ -138,16 +132,16 @@ app.patch("/api/wallet/:id", (req, res) => {
         })
         .catch(err => {
             console.log("Error updating wallet", err);
-            res.status(404)
-            res.send(err);
+            res.status(404);
+            res.send("Error updating wallet: ", err);
         });
 });
 
+//bad get requests send you home
+app.get("/*", (err, res) => {
+    console.log("here!");
 
-//bad get requests send you home. you monster.
-app.get('/*', (err, res) => {
-    console.log('here!')
-    res.sendFile(path.join(__dirname, '../client/dist/index.html'))
+    res.sendFile(path.join(__dirname, "../client/dist/index.html"));
 });
 
 const getLiveCoinData = () => { //
@@ -231,9 +225,3 @@ const getLiveCoinData = () => { //
 app.listen(port, function () {
     console.log('listening on port ' + port + '!');
 });
-
-getLiveCoinData();
-setInterval(() => {
-    console.log('Pinging the API for values');
-    getLiveCoinData();
-}, 70000); //Recommended min 70sec setInterval
