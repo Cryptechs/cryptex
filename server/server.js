@@ -157,82 +157,84 @@ const getLiveCoinData = () => { //
     for (let i = 0; i < coinNames.length; i++) {
         let dummyPromise = axios
             .get(
-            "https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency="
-            + coinNames[i] 
-            + "&to_currency=USD&apikey=" 
-            + ALPHA_ADVANTAGE_API_KEY
+                "https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=" +
+                coinNames[i] +
+                "&to_currency=USD&apikey=" +
+                ALPHA_ADVANTAGE_API_KEY
             )
-            .then(function(res) {
-            // The API has long "normal English" names for keys. 
-            // console.log("Currency", res.data['Realtime Currency Exchange Rate']['1. From_Currency Code']);
-            // console.log("Rate", res.data['Realtime Currency Exchange Rate']['5. Exchange Rate']);
-            // console.log("Timestamp", res.data['Realtime Currency Exchange Rate']['6. Last Refreshed']);
-            output[coinNames[i]] = res.data['Realtime Currency Exchange Rate']['1. From_Currency Code'];
-            output[coinNames[i] + '_value'] = res.data['Realtime Currency Exchange Rate']['5. Exchange Rate'];
-            output['timestamp'] = res.data['Realtime Currency Exchange Rate']['6. Last Refreshed'];
+            .then(function (res) {
+                // The API has long "normal English" names for keys. 
+                // console.log("Currency", res.data['Realtime Currency Exchange Rate']['1. From_Currency Code']);
+                // console.log("Rate", res.data['Realtime Currency Exchange Rate']['5. Exchange Rate']);
+                // console.log("Timestamp", res.data['Realtime Currency Exchange Rate']['6. Last Refreshed']);
+                output[coinNames[i]] = res.data['Realtime Currency Exchange Rate']['1. From_Currency Code'];
+                output[coinNames[i] + '_value'] = res.data['Realtime Currency Exchange Rate']['5. Exchange Rate'];
+                output['timestamp'] = res.data['Realtime Currency Exchange Rate']['6. Last Refreshed'];
             }).catch(console.log('error getting', coinNames[i]));
-            /*.catch(function(error) {
-            console.log("*** Error Getting data from AlphaAdvantage:", error);
-            })*/
+        /*.catch(function(error) {
+        console.log("*** Error Getting data from AlphaAdvantage:", error);
+        })*/
         promiseArray.push(dummyPromise);
     }
-    Promise.all(promiseArray).then(()=>{
-        if(output.timestamp 
-            && output.BTC_value 
-            && output.LTC_value
-            && output.ETH_value
-            && output.XRP_value
-            && output.EOS_value) {
+    Promise.all(promiseArray).then(() => {
+        if (output.timestamp &&
+            output.BTC_value &&
+            output.LTC_value &&
+            output.ETH_value &&
+            output.XRP_value &&
+            output.EOS_value) {
             console.log('INSERTING:', output)
             knex('coin_values').insert({
-                time_value: output.timestamp,
-                c1_value: output.BTC_value,
-                c2_value: output.LTC_value,
-                c4_value: output.ETH_value,
-                c5_value: output.XRP_value,
-                c3_value: output.EOS_value,
-            })
-            .then(()=> {
-                //add a row users wallets with the timestamp and their current amounts (super hacky)
-                knex('wallets').distinct().select('user_id') //gets list of distinct usernames
-                .then((resNames)=> {
-                    console.log('resNames', resNames);
-                    //resNames is an array of objects containing just names e.g. [{ user_id: 'name@email.com' }]
-                    for(let i=0; i < resNames.length; i++){
-                        let subquery = knex('wallets')
-                        knex('wallets').where('user_id', resNames[i].user_id).select().orderBy('timestamp', 'desc').limit(1)
-                        .then((recentRow)=>{ //now that we have the most recent row for a username
-                            console.log('recentRow', recentRow);
-                            knex('wallets').insert({
-                                user_id: resNames[i].user_id,
-                                timestamp: output.timestamp,
-                                c1_amount: recentRow[0].c1_amount,
-                                c2_amount: recentRow[0].c2_amount,
-                                c4_amount: recentRow[0].c3_amount,
-                                c5_amount: recentRow[0].c4_amount,
-                                c3_amount: recentRow[0].c5_amount,
-                            })
-                            .then(()=>{console.log('Updated user', resNames[i].user_id)})
-                            .catch(()=>{console.log('Error: could not update user data')});
-
-                        })
-                    }
+                    time_value: output.timestamp,
+                    c1_value: output.BTC_value,
+                    c2_value: output.LTC_value,
+                    c4_value: output.ETH_value,
+                    c5_value: output.XRP_value,
+                    c3_value: output.EOS_value,
                 })
-            });
+                .then(() => {
+                    //add a row users wallets with the timestamp and their current amounts (super hacky)
+                    knex('wallets').distinct().select('user_id') //gets list of distinct usernames
+                        .then((resNames) => {
+                            console.log('resNames', resNames);
+                            //resNames is an array of objects containing just names e.g. [{ user_id: 'name@email.com' }]
+                            for (let i = 0; i < resNames.length; i++) {
+                                let subquery = knex('wallets')
+                                knex('wallets').where('user_id', resNames[i].user_id).select().orderBy('timestamp', 'desc').limit(1)
+                                    .then((recentRow) => { //now that we have the most recent row for a username
+                                        console.log('recentRow', recentRow);
+                                        knex('wallets').insert({
+                                                user_id: resNames[i].user_id,
+                                                timestamp: output.timestamp,
+                                                c1_amount: recentRow[0].c1_amount,
+                                                c2_amount: recentRow[0].c2_amount,
+                                                c4_amount: recentRow[0].c3_amount,
+                                                c5_amount: recentRow[0].c4_amount,
+                                                c3_amount: recentRow[0].c5_amount,
+                                            })
+                                            .then(() => {
+                                                console.log('Updated user', resNames[i].user_id)
+                                            })
+                                            .catch(() => {
+                                                console.log('Error: could not update user data')
+                                            });
+
+                                    })
+                            }
+                        })
+                });
         } else {
             console.log('Failed to get insert update to coin_values');
         }
     }).catch(console.log('Failed to get complete update.'));
-  }
+}
 
-app.listen(3000, function () {
-    console.log('listening on port 3000!');
+app.listen(port, function () {
+    console.log('listening on port ' + port + '!');
 });
 
 getLiveCoinData();
-setInterval(()=>{
+setInterval(() => {
     console.log('Pinging the API for values');
     getLiveCoinData();
 }, 70000); //Recommended min 70sec setInterval
-
-

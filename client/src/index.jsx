@@ -41,7 +41,6 @@ class App extends React.Component {
     //   coinNames
     // } = this.createMockWalletAndCoinsDataAndCoinNames();
 
-    debugger;
     this.retrieveWallet(wallet => {
       this.getLiveCoinDataAndCoinFullNamesFromAPI(coinNames);
 
