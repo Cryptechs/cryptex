@@ -116,13 +116,18 @@ app.get("/api/wallet/:id", (req, res) => {
 });
 
 app.patch("/api/wallet/:id", (req, res) => {
+    //MJW: On day of presentation, no longer uses timestamp in req.body (it's too old)
     console.log("updating current wallet");
     console.log("params", req.params);
     console.log("req body:", req.body);
-    knex("wallets")
+    
+    knex('wallets').where('user_id', req.params.id).select().orderBy('timestamp', 'desc').limit(1)
+    .then((recentRow) => { //now that we have the most recent row for a username
+        console.log('PATCHING recentRow', recentRow)
+        knex("wallets")
         .where({
             user_id: req.params.id,
-            timestamp: req.body.timestamp
+            timestamp: recentRow.timestamp
         })
         .update({
             c1_amount: req.body.c1,
@@ -140,7 +145,8 @@ app.patch("/api/wallet/:id", (req, res) => {
             console.log("Error updating wallet", err);
             res.status(404)
             res.send(err);
-        });
+        })
+    });
 });
 
 
@@ -199,7 +205,6 @@ const getLiveCoinData = () => { //
                             console.log('resNames', resNames);
                             //resNames is an array of objects containing just names e.g. [{ user_id: 'name@email.com' }]
                             for (let i = 0; i < resNames.length; i++) {
-                                let subquery = knex('wallets')
                                 knex('wallets').where('user_id', resNames[i].user_id).select().orderBy('timestamp', 'desc').limit(1)
                                     .then((recentRow) => { //now that we have the most recent row for a username
                                         console.log('recentRow', recentRow);
