@@ -10,6 +10,10 @@ import { Link, Redirect } from "react-router-dom";
 import { create } from "domain";
 import { runInThisContext } from "vm";
 
+// candlestick charting /
+import { render } from "react-dom";
+import { getData } from "./components/utils";
+
 const coinNames = ["BTC", "LTC", "ETH", "XRP", "EOS"];
 
 class App extends React.Component {
@@ -18,7 +22,8 @@ class App extends React.Component {
     this.state = {
       coinData: [],
       coinFullNames: [],
-      wallet: {}
+      wallet: {},
+      coinCandlestickData: []
     };
 
     this.handleUpdateCoinAmounts = this.handleUpdateCoinAmounts.bind(this);
@@ -44,7 +49,11 @@ class App extends React.Component {
     this.retrieveWallet(wallet => {
       this.getLiveCoinDataAndCoinFullNamesFromAPI(coinNames);
 
-      //look for wallet
+      // getData().then(candleData => {
+      //   console.log("candleData=", candleData);
+      //   this.setState({ candleData: candleData });
+      // });
+
       this.setState({
         wallet: wallet
       });
@@ -86,6 +95,7 @@ class App extends React.Component {
   getLiveCoinDataAndCoinFullNamesFromAPI(coinNames) {
     let coinFullNames = coinNames.slice();
     let coinsData = [];
+    const candlestickCoinsData = [];
     for (let coinIdx = 0; coinIdx < coinNames.length; coinIdx++) {
       let self = this;
       axios
@@ -110,6 +120,8 @@ class App extends React.Component {
               response.data["Meta Data"]["2. Digital Currency Code"]
             );
           }
+
+          // Get the basic coins data
           for (let i = 50; i >= 0; i--) {
             let data =
               response.data["Time Series (Digital Currency Daily)"][
@@ -127,7 +139,38 @@ class App extends React.Component {
 
           //let wallet = self.createWalletFromCoinsData(coinsData, coinNames); // only for mock data
 
+          // Candlestick data format
+          let timeSeriesKeys = Object.keys(
+            response.data["Time Series (Digital Currency Daily)"]
+          );
+          candlestickCoinsData[coinIndex] = [];
+          for (let i = timeSeriesKeys.length - 1; i >= 0; i--) {
+            let row =
+              response.data["Time Series (Digital Currency Daily)"][
+                timeSeriesKeys[i]
+              ];
+
+            let timeSeriesDate = timeSeriesKeys[i].split("-"); //2018-10-27
+            let formattedRow = {
+              date: new Date(
+                timeSeriesDate[0],
+                timeSeriesDate[1] - 1, // in js Date, months are zero based
+                timeSeriesDate[2]
+              ), // Month, Day, Year
+              open: +row["1a. open (USD)"],
+              high: +row["2a. high (USD)"],
+              low: +row["3a. low (USD)"],
+              close: +row["4a. close (USD)"],
+              volume: +row["5. volume"],
+              marketCap: +row["6. market cap (USD)"],
+              coinName: coinNames[coinIndex],
+              coinFullName: coinFullNames[coinIndex]
+            };
+            candlestickCoinsData[coinIndex].push(formattedRow);
+          }
+
           self.setState({
+            candlestickCoinsData: candlestickCoinsData,
             coinsData: coinsData,
             // wallet: wallet, // mock only
             coinFullNames: coinFullNames.slice()
@@ -262,6 +305,7 @@ class App extends React.Component {
           coinsData={this.state.coinsData}
           wallet={this.state.wallet}
           coinFullNames={this.state.coinFullNames}
+          candlestickCoinsData={this.state.candlestickCoinsData}
         />
         <Wallet
           wallet={this.state.wallet}
